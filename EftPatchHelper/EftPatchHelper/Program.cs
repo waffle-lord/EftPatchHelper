@@ -13,6 +13,8 @@ if(settings == null)
     settings.Save();
 
     AnsiConsole.MarkupLine($"Settings file was create here: \n[blue]{Settings.settingsFile}[/]\n\nPlease update it and try again.");
+    AnsiConsole.MarkupLine("Press [blue]Enter[/] to close ...");
+    Console.ReadLine();
     return;
 }
 
@@ -21,6 +23,7 @@ if(!settings.Validate())
 {
     AnsiConsole.MarkupLine($"[red]Settings file seems to be missing some information, please fix it[/]\n\nPath to file:\n[blue]{Settings.settingsFile}[/]\n\n");
     AnsiConsole.MarkupLine("Press [blue]Enter[/] to close ...");
+    Console.ReadLine();
     return;
 }
 
