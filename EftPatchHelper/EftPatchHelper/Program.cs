@@ -1,10 +1,12 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using EftPatchHelper;
+using EftPatchHelper.EftInfo;
 using EftPatchHelper.Helpers;
 using Spectre.Console;
 using System.Diagnostics;
 
 Settings? settings = Settings.Load();
+
 
 // check settings file exists
 if(settings == null)
@@ -37,92 +39,63 @@ AnsiConsole.MarkupLine($"Prep folder path is [purple]{settings.PrepFolderPath}[/
 AnsiConsole.MarkupLine($"Backup folder path is [purple]{settings.BackupFolderPath}[/]");
 AnsiConsole.WriteLine();
 
-// Source Selection Prompt
-SelectionPrompt<string> sourcePrompt = new SelectionPrompt<string>()
-{
-    Title = "Select Source Version",
-    MoreChoicesText = "Move cursor to see more versions",
-    PageSize = 10
-};
+EftClientSelector.LoadClientList(settings);
 
-// Get eft live version
-var eftVersion = FileVersionInfo.GetVersionInfo(Path.Join(settings.LiveEftPath, "EscapeFromTarkov.exe")).ProductVersion?.Replace('-', '.');
+EftClient targetClient = EftClientSelector.GetClient(settings.TargetEftVersion);
+EftClient sourceClient;
 
-if(eftVersion != null)
+AnsiConsole.WriteLine();
+bool promptToOverwrite = new ConfirmationPrompt("Prompt to overwrite directories?").Show(AnsiConsole.Console);
+
+AnsiConsole.WriteLine();
+ConfirmationPrompt confirmTarget = new ConfirmationPrompt($"Use version [purple]{settings.TargetEftVersion}[/] as target?");
+
+if (!confirmTarget.Show(AnsiConsole.Console) || targetClient == null)
 {
-    //remove leading 0 from version number
-    if (eftVersion.StartsWith("0."))
+    targetClient = EftClientSelector.GetClientSelection("Select [yellow]Target[/] Version");
+
+    AnsiConsole.WriteLine();
+    ConfirmationPrompt changeVersion = new ConfirmationPrompt($"Update settings target version to use [purple]{targetClient.Version}[/]?");
+
+    if(changeVersion.Show(AnsiConsole.Console))
     {
-        eftVersion = eftVersion.Remove(0, 2);
-    }
+        settings.TargetEftVersion = targetClient.Version;
 
-    // add eft liver version to selection prompt choices
-    sourcePrompt.AddChoice($"Live: {eftVersion}");
-}
-
-// add backup folders to source prompt choices
-foreach(string backup in Directory.GetDirectories(settings.BackupFolderPath))
-{
-    DirectoryInfo backupDir = new DirectoryInfo(backup);
-
-    if(!backupDir.Exists)
-    {
-        continue;
-    }
-
-    sourcePrompt.AddChoice($"Backup: {backupDir.Name}");
-}
-
-
-string result = sourcePrompt.Show(AnsiConsole.Console);
-
-string sourceVersion = result.Split(": ")[1];
-
-string sourceBackupPath = Path.Join(settings.BackupFolderPath, sourceVersion);
-
-//backup live folder if it was selected
-if(result.StartsWith("Live:"))
-{
-    // only backup the live folder if it doesn't exist already
-    if(!Directory.Exists(sourceBackupPath))
-    {
-        AnsiConsole.MarkupLine("[blue]Backing up live ...[/]");
-        FolderCopy backupLiveCopy = new FolderCopy(settings.LiveEftPath, sourceBackupPath);
-
-        backupLiveCopy.Start();
+        settings.Save();
     }
 }
 
-string targetBackupPath = Path.Join(settings.BackupFolderPath, settings.TargetEftVersion);
+sourceClient = EftClientSelector.GetClientSelection("Select [blue]Source[/] Version");
 
-string targetPrepPath = Path.Join(settings.PrepFolderPath, settings.TargetEftVersion);
 
-string sourcePrepPath = Path.Join(settings.PrepFolderPath, sourceVersion);
-
+//backup data if needed
+targetClient.Backup(settings, !promptToOverwrite);
+sourceClient.Backup(settings, !promptToOverwrite);
 
 //copy source to prep directory
+AnsiConsole.WriteLine();
 AnsiConsole.MarkupLine("[gray]Copying[/] [blue]source[/][gray] to prep area ...[/]");
 
-FolderCopy sourceCopy = new FolderCopy(sourceBackupPath, sourcePrepPath);
+FolderCopy sourceCopy = new FolderCopy(sourceClient.FolderPath, sourceClient.PrepPath);
 
-sourceCopy.Start();
+sourceCopy.Start(!promptToOverwrite);
 
 //copy target to prep directory
 AnsiConsole.MarkupLine("[gray]Copying[/] [blue]target[/][gray] to prep area ...[/]");
 
-FolderCopy targetCopy = new FolderCopy(targetBackupPath, targetPrepPath);
+FolderCopy targetCopy = new FolderCopy(targetClient.FolderPath, targetClient.PrepPath);
 
-targetCopy.Start();
+targetCopy.Start(!promptToOverwrite);
 
 // clean prep source and target folders of uneeded data
-FolderCleaner.Clean(sourcePrepPath);
+FolderCleaner.Clean(sourceClient.PrepPath);
 
-FolderCleaner.Clean(targetPrepPath);
+FolderCleaner.Clean(targetClient.PrepPath);
 
 // start patcher
 if(File.Exists(settings.PatcherEXEPath))
 {
-    string patcherOutputName = $"Patcher_{sourceVersion}_to_{settings.TargetEftVersion}";
+    string patcherOutputName = $"Patcher_{sourceClient.Version}_to_{targetClient.Version}";
 
     AnsiConsole.Markup("Starting patcher ... ");
 
@@ -130,7 +103,7 @@ if(File.Exists(settings.PatcherEXEPath))
     {
         FileName = settings.PatcherEXEPath,
         WorkingDirectory = new FileInfo(settings.PatcherEXEPath).Directory?.FullName ?? Directory.GetCurrentDirectory(),
-        ArgumentList = {$"OutputFolderName::{patcherOutputName}", $"SourceFolderPath::{sourcePrepPath}", $"TargetFolderPath::{targetPrepPath}", $"AutoZip::{settings.AutoZip}"}
+        ArgumentList = {$"OutputFolderName::{patcherOutputName}", $"SourceFolderPath::{sourceClient.PrepPath}", $"TargetFolderPath::{targetClient.PrepPath}", $"AutoZip::{settings.AutoZip}"}
     });
 }
 

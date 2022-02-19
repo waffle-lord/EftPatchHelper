@@ -18,7 +18,7 @@ namespace EftPatchHelper.Helpers
             this.DestinationFolder = DestinationFolder;
         }
 
-        public bool Start()
+        public bool Start(bool IgnoreIfExists = false)
         {
             DirectoryInfo sourceDir = new DirectoryInfo(SourceFolder);
             DirectoryInfo destDir = new DirectoryInfo(DestinationFolder);
@@ -28,9 +28,14 @@ namespace EftPatchHelper.Helpers
                 destDir.Create();
                 destDir.Refresh();
             }
+            else if (IgnoreIfExists)
+            {
+                AnsiConsole.MarkupLine("[yellow]Exists[/]");
+                return true;
+            }
             else
             {
-                if(!AnsiConsole.Confirm($"{destDir.FullName} exists. Do you want to overwright it?", false))
+                if (!AnsiConsole.Confirm($"{destDir.FullName} exists. Do you want to overwright it?", false))
                 {
                     AnsiConsole.MarkupLine("[yellow]Using existing folder[/]");
                     return true;
