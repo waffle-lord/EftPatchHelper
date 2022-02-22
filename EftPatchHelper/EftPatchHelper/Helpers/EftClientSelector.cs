@@ -11,17 +11,9 @@ namespace EftPatchHelper.Helpers
         public static string? GetLiveVersion(Settings settings)
         {
             // Get eft live version
-            string eftVersion = FileVersionInfo.GetVersionInfo(Path.Join(settings.LiveEftPath, "EscapeFromTarkov.exe")).ProductVersion?.Replace('-', '.');
+            string eftVersion = FileVersionInfo.GetVersionInfo(Path.Join(settings.LiveEftPath, "EscapeFromTarkov.exe")).FileVersion;
 
-            //remove leading 0 from version number
-            if (eftVersion != null && eftVersion.StartsWith("0."))
-            {
-                eftVersion = eftVersion.Remove(0, 2);
-            }
-
-            string[] fixedVersion = eftVersion.Split('.')[0..4];
-
-            return string.Join('.', fixedVersion);
+            return string.Join('.', eftVersion);
         }
 
         public static EftClient GetClient(string Version)
