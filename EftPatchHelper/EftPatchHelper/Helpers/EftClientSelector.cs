@@ -19,7 +19,9 @@ namespace EftPatchHelper.Helpers
                 eftVersion = eftVersion.Remove(0, 2);
             }
 
-            return eftVersion;
+            string[] fixedVersion = eftVersion.Split('.')[0..4];
+
+            return string.Join('.', fixedVersion);
         }
 
         public static EftClient GetClient(string Version)
