@@ -1,4 +1,5 @@
 ﻿using EftPatchHelper.Helpers;
+using EftPatchHelper.Model;
 using Spectre.Console;
 
 namespace EftPatchHelper.EftInfo

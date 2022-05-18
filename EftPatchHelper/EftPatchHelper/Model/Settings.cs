@@ -1,29 +1,32 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace EftPatchHelper
+namespace EftPatchHelper.Model
 {
     public class Settings
     {
         [JsonIgnore]
         public static string settingsFile = Path.Join(Directory.GetCurrentDirectory(), "settings.json");
 
-        [JsonPropertyName("target_eft_version")]
+        [JsonPropertyName("targetEftVersion")]
         public string TargetEftVersion { get; set; } = "";
 
-        [JsonPropertyName("prep_folder_path")]
+        [JsonPropertyName("prepFolderPath")]
         public string PrepFolderPath { get; set; } = "";
 
-        [JsonPropertyName("backup_folder_path")]
+        [JsonPropertyName("backupFolderPath")]
         public string BackupFolderPath { get; set; } = "";
 
-        [JsonPropertyName("live_eft_path")]
+        [JsonPropertyName("liveEftPath")]
         public string LiveEftPath { get; set; } = "";
 
-        [JsonPropertyName("auto_zip")]
+        [JsonPropertyName("autoZip")]
         public bool AutoZip { get; set; } = true;
 
-        [JsonPropertyName("patcher_exe_path")]
+        [JsonPropertyName("autoClose")]
+        public bool AutoClose { get; set; } = false;
+
+        [JsonPropertyName("patcherExePath")]
         public string PatcherEXEPath { get; set; } = "";
 
         public void Save()
@@ -35,14 +38,14 @@ namespace EftPatchHelper
             File.WriteAllText(settingsFile, json);
         }
 
-        public static Settings? Load()
-        {
-            if (!File.Exists(settingsFile)) return null;
+        //public static Settings? Load()
+        //{
+        //    if (!File.Exists(settingsFile)) return null;
 
-            string json = File.ReadAllText(settingsFile);
+        //    string json = File.ReadAllText(settingsFile);
 
-            return JsonSerializer.Deserialize<Settings>(json);
-        }
+        //    return JsonSerializer.Deserialize<Settings>(json);
+        //}
 
         public bool Validate()
         {

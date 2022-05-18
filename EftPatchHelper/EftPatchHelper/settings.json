@@ -1,0 +1,9 @@
+{
+  "targetEftVersion": "C:\\users\\johno\\desktop\\tmp",
+  "prepFolderPath": "C:\\users\\johno\\desktop\\tmp",
+  "backupFolderPath": "C:\\users\\johno\\desktop\\tmp",
+  "liveEftPath": "C:\\users\\johno\\desktop\\tmp",
+  "patcherExePath": "C:\\users\\johno\\desktop\\tmp",
+  "autoZip": true,
+  "autoClose": false
+}
