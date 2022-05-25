@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using EftPatchHelper.EftInfo;
 
 namespace EftPatchHelper.Model
 {
     public class Options
     {
-        public bool PromptToOverwriteDirectories = true;
+        public bool IgnoreExistingDirectories = true;
+        public EftClient TargetClient = null;
+        public EftClient SourceClient = null;
     }
 }

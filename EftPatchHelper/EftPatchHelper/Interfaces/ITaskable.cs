@@ -1,6 +1,4 @@
-﻿using EftPatchHelper.Model;
-
-namespace EftPatchHelper.Interfaces
+﻿namespace EftPatchHelper.Interfaces
 {
     public interface ITaskable
     {
@@ -8,6 +6,6 @@ namespace EftPatchHelper.Interfaces
         /// Runs a predefined task
         /// </summary>
         /// <returns>Returns true if the task succeeded, otherwise false</returns>
-        public bool Run();
+        public void Run();
     }
 }

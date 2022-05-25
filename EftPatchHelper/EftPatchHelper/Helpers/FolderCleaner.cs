@@ -6,7 +6,7 @@ namespace EftPatchHelper.Helpers
     {
         public static string cleanPathsFile = Path.Join(Directory.GetCurrentDirectory(), "removePaths.txt");
 
-        public static string[] AssumedPaths = 
+        public static string[] AssumedPaths =
         {
             "BattlEye",
             "cache",
@@ -43,11 +43,11 @@ namespace EftPatchHelper.Helpers
                     {
                         fsInfo.Delete();
                     }
-                    
+
 
                     fsInfo.Refresh();
 
-                    if(!fsInfo.Exists)
+                    if (!fsInfo.Exists)
                     {
                         AnsiConsole.MarkupLine($"[blue]INFO:[/] [gray]Deleting {fsInfo.Name} ...[/] [green]OK[/]");
                         continue;

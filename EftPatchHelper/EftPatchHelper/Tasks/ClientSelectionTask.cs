@@ -1,6 +1,8 @@
-﻿using EftPatchHelper.Helpers;
+﻿using EftPatchHelper.Extensions;
+using EftPatchHelper.Helpers;
 using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
+using Spectre.Console;
 
 namespace EftPatchHelper.Tasks
 {
@@ -17,9 +19,51 @@ namespace EftPatchHelper.Tasks
             _clientSelector = clientSelector;
         }
 
-        public bool Run()
+        private bool ChangeSettingsTargetVersion()
         {
-            
+            var targetClient = _clientSelector.GetClientSelection("Select [yellow]Target[/] Version");
+
+            AnsiConsole.WriteLine();
+            ConfirmationPrompt changeVersion = new ConfirmationPrompt($"Update settings target version to use [purple]{targetClient.Version}[/]?");
+
+            if (changeVersion.Show(AnsiConsole.Console))
+            {
+                _settings.TargetEftVersion = targetClient.Version;
+
+                return _settings.Save();
+            }
+
+            return true;
+        }
+
+        private bool ConfirmExistingTargetVersion()
+        {
+            _clientSelector.LoadClientList();
+
+            _options.TargetClient = _clientSelector.GetClient(_settings.TargetEftVersion);
+
+            ConfirmationPrompt confirmTarget = new ConfirmationPrompt($"Use version [purple]{_settings.TargetEftVersion}[/] as target?");
+
+            // If client is null or requested change, return false to ensure change settings target is called.
+            return _options.TargetClient == null || !confirmTarget.Show(AnsiConsole.Console);
+        }
+
+        private bool SelectSourceVersion()
+        {
+            _options.SourceClient = _clientSelector.GetClientSelection("Select [blue]Source[/] Version");
+
+            return _options.SourceClient != null;
+        }
+
+        public void Run()
+        {
+            if (ConfirmExistingTargetVersion())
+            {
+                ChangeSettingsTargetVersion().ValidateOrExit();
+            }
+
+            SelectSourceVersion().ValidateOrExit();
         }
     }
 }
+

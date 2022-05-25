@@ -60,18 +60,16 @@ namespace EftPatchHelper.Tasks
 
         private void ConfirmOptions()
         {
-            _options.PromptToOverwriteDirectories = new ConfirmationPrompt("Prompt to overwrite directories?").Show(AnsiConsole.Console);
+            _options.IgnoreExistingDirectories = new ConfirmationPrompt("Skip existing directories? (you will be prompted if no)").Show(AnsiConsole.Console);
         }
 
-        public bool Run()
+        public void Run()
         {
             ValidateSettings().ValidateOrExit();
 
             ConfirmOptions();
 
             PrintSummary();
-
-            return true;
         }
     }
 }
