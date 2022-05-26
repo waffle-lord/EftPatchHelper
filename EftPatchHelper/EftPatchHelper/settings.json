@@ -1,0 +1,9 @@
+{
+  "targetEftVersion": "",
+  "prepFolderPath": "",
+  "backupFolderPath": "",
+  "liveEftPath": "",
+  "patcherExePath": "",
+  "autoZip": true,
+  "autoClose": false
+}
