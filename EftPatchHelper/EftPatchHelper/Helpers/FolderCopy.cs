@@ -18,7 +18,7 @@ namespace EftPatchHelper.Helpers
             this.DestinationFolder = DestinationFolder;
         }
 
-        public bool Start(bool IgnoreIfExists = false)
+        public bool Start(bool IgnoreIfExists = false, bool merge = false)
         {
             DirectoryInfo sourceDir = new DirectoryInfo(SourceFolder);
             DirectoryInfo destDir = new DirectoryInfo(DestinationFolder);
@@ -33,7 +33,7 @@ namespace EftPatchHelper.Helpers
                 AnsiConsole.MarkupLine("[yellow]Exists[/]");
                 return true;
             }
-            else
+            else if(!merge)
             {
                 if (!AnsiConsole.Confirm($"{destDir.FullName} exists. Do you want to overwright it?", false))
                 {

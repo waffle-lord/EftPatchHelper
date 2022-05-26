@@ -25,7 +25,7 @@ namespace EftPatchHelper.Model
         public bool AutoZip { get; set; } = true;
 
         [JsonPropertyName("autoClose")]
-        public bool AutoClose { get; set; } = false;
+        public bool AutoClose { get; set; } = true;
 
         [JsonPropertyName("patcherExePath")]
         public string PatcherEXEPath { get; set; } = "";
