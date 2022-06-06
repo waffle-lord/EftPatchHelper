@@ -30,6 +30,18 @@ namespace EftPatchHelper.Model
         [JsonPropertyName("patcherExePath")]
         public string PatcherEXEPath { get; set; } = "";
 
+        [JsonPropertyName("giteaApiBasePath")]
+        public string GiteaApiBasePath { get; set; } = "";
+
+        [JsonPropertyName("giteaApiKey")]
+        public string GiteaApiKey { get; set; } = "";
+
+        [JsonPropertyName("giteaReleaseRepoOwner")]
+        public string GiteaReleaseRepoOwner { get; set; } = "";
+
+        [JsonPropertyName("giteaReleaseRepoName")]
+        public string GiteaReleaseRepoName { get; set; } = "";
+
         public bool Save()
         {
             try
@@ -51,6 +63,19 @@ namespace EftPatchHelper.Model
                 AnsiConsole.WriteException(ex);
                 return false;
             }
+        }
+
+        public bool UsingGitea()
+        {
+            if (string.IsNullOrWhiteSpace(GiteaApiBasePath)) return false;
+
+            if (string.IsNullOrWhiteSpace(GiteaReleaseRepoOwner)) return false;
+
+            if (string.IsNullOrWhiteSpace(GiteaReleaseRepoName)) return false;
+
+            if (string.IsNullOrWhiteSpace(GiteaApiKey)) return false;
+
+            return true;
         }
 
         public bool Validate()

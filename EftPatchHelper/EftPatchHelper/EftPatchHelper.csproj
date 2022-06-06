@@ -8,10 +8,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FubarCoder.RestSharp.Portable.Core" Version="4.0.8" />
+    <PackageReference Include="FubarCoder.RestSharp.Portable.HttpClient" Version="4.0.8" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Spectre.Console" Version="0.44.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Gitea">
+      <HintPath>Resources\Gitea.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

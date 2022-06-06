@@ -5,5 +5,9 @@
   "liveEftPath": "",
   "patcherExePath": "",
   "autoZip": true,
-  "autoClose": false
+  "autoClose": false,
+  "giteaApiBasePath": "", //leave the gitea settings blank to not create a release on gitea
+  "giteaApiKey": "",
+  "giteaReleaseRepoOwner": "",
+  "giteaReleaseRepoName": ""
 }
