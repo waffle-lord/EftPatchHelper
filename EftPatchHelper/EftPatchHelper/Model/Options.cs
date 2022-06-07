@@ -5,7 +5,7 @@ namespace EftPatchHelper.Model
     public class Options
     {
         /// <summary>
-        /// A value that says if the user opted to ignore existing directories.
+        /// Whether or not the user opted to ignore existing directories.
         /// </summary>
         public bool IgnoreExistingDirectories = false;
 
@@ -23,5 +23,10 @@ namespace EftPatchHelper.Model
         /// The path to the patch folder containing the patches that were generated
         /// </summary>
         public string OutputPatchPath = null;
+
+        /// <summary>
+        /// Whether or not the user opted to create a release on gitea
+        /// </summary>
+        public bool CreateRelease = false;
     }
 }
