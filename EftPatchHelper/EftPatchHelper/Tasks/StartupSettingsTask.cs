@@ -61,6 +61,10 @@ namespace EftPatchHelper.Tasks
         private void ConfirmOptions()
         {
             _options.IgnoreExistingDirectories = new ConfirmationPrompt("Skip existing directories? (you will be prompted if no)").Show(AnsiConsole.Console);
+
+            if (!_settings.UsingGitea()) return;
+
+            _options.CreateRelease = new ConfirmationPrompt("Create a release on gitea?").Show(AnsiConsole.Console);
         }
 
         public void Run()
