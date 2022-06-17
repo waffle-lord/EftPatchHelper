@@ -55,7 +55,7 @@ namespace EftPatchHelper.Helpers
                 new ProgressBarColumn(),
                 new PercentageColumn(),
                 new ElapsedTimeColumn(),
-                new SpinnerColumn()
+                new SpinnerColumn(Spinner.Known.Dots2)
             })
             .Start(ctx =>
             {

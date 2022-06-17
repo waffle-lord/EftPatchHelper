@@ -37,7 +37,7 @@ namespace EftPatchHelper.Tasks
 
             _options.OutputPatchPath = Path.Join(patcherPath, patcherOutputName);
 
-            return AnsiConsole.Status().Start("Staring Patch Generator ...", (StatusContext context) =>
+            return AnsiConsole.Status().Spinner(Spinner.Known.Shark).Start("Staring Patch Generator ...", (StatusContext context) =>
             {
                 var genProc = Process.Start(new ProcessStartInfo()
                 {

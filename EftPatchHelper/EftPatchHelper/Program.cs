@@ -21,6 +21,8 @@ namespace EftPatchHelper
 
         public static void Main(string[] args)
         {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
             AnsiConsole.Write(new FigletText("EFT Patch Helper").Centered().Color(Color.Blue));
 
             var host = ConfigureHost(args);

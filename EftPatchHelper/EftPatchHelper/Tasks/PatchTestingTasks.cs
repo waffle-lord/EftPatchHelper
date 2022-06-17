@@ -34,7 +34,7 @@ namespace EftPatchHelper.Tasks
 
             patcherCopy.Start(false, true);
 
-            return AnsiConsole.Status().Start("Starting Patcher ...", (StatusContext context) =>
+            return AnsiConsole.Status().Spinner(Spinner.Known.Shark).Start("Starting Patcher ...", (StatusContext context) =>
             {
                 var patchProcess = Process.Start(new ProcessStartInfo()
                 {

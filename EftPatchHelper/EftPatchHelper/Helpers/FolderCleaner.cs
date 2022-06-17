@@ -21,7 +21,7 @@ namespace EftPatchHelper.Helpers
         public static void Clean(string FolderPath)
         {
             AnsiConsole.Status()
-            .Spinner(Spinner.Known.Default)
+            .Spinner(Spinner.Known.Dots2)
             .Start($"Cleaning Folder ...", ctx =>
             {
                 AnsiConsole.MarkupLine($"[blue]INFO:[/] [gray]Getting folders to remove for {FolderPath} ...[/]");
