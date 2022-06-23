@@ -21,7 +21,7 @@ namespace EftPatchHelper.Tasks
 
         private bool UploadAsset(FileInfo file, Release release, RepositoryApi repo)
         {
-            return AnsiConsole.Status().Spinner(Spinner.Known.Arrow3).Start("Uploading Asset", (StatusContext context) =>
+            return AnsiConsole.Status().Spinner(Spinner.Known.Point).Start("Uploading Asset", (StatusContext context) =>
             {
                 AnsiConsole.MarkupLine($"[blue]Adding release asset: {file.Name.EscapeMarkup()}[/]");
 
