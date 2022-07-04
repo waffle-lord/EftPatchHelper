@@ -65,6 +65,22 @@ namespace EftPatchHelper.Tasks
             if (!_settings.UsingGitea()) return;
 
             _options.CreateRelease = new ConfirmationPrompt("Create a release on gitea?").Show(AnsiConsole.Console);
+
+            if(_options.CreateRelease)
+            {
+                // only allow upload options if the release is not being made
+                return;
+            }
+
+            if (_settings.UsingMega())
+            {
+                _options.UploadToMega = new ConfirmationPrompt("Upload to Mega?").Show(AnsiConsole.Console);
+            }
+
+            if (_settings.UsingGoFile())
+            {
+                _options.UploadToGoFile = new ConfirmationPrompt("Upload to GoFile?").Show(AnsiConsole.Console);
+            }
         }
 
         public void Run()

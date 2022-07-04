@@ -18,6 +18,7 @@ namespace EftPatchHelper
         ITaskable _patchGenTasks;
         ITaskable _patchTestingTasks;
         ITaskable _createReleaseTasks;
+        ITaskable _uploadTasks;
 
         public static void Main(string[] args)
         {
@@ -38,7 +39,8 @@ namespace EftPatchHelper
             IFileProcessingTasks fileProcessingTasks,
             IPatchGenTasks patchGenTasks,
             IPatchTestingTasks patchTestingTasks,
-            IReleaseCreator createReleaseTasks
+            IReleaseCreator createReleaseTasks,
+            IUploadTasks uploadTasks
             )
         {
             _settingsTasks = settingsTasks;
@@ -47,6 +49,7 @@ namespace EftPatchHelper
             _patchGenTasks = patchGenTasks;
             _patchTestingTasks = patchTestingTasks;
             _createReleaseTasks = createReleaseTasks;
+            _uploadTasks = uploadTasks;
         }
 
         public void Run()
@@ -57,6 +60,7 @@ namespace EftPatchHelper
             _patchGenTasks.Run();
             _patchTestingTasks.Run();
             _createReleaseTasks.Run();
+            _uploadTasks.Run();
         }
 
         private static IHost ConfigureHost(string[] args)
@@ -80,6 +84,7 @@ namespace EftPatchHelper
                 services.AddTransient<IPatchGenTasks, PatchGenTasks>();
                 services.AddTransient<IPatchTestingTasks, PatchTestingTasks>();
                 services.AddTransient<IReleaseCreator, CreateReleaseTasks>();
+                services.AddTransient<IUploadTasks, UploadTasks>();
                 services.AddTransient<Program>();
             })
             .ConfigureAppConfiguration((_, config) =>

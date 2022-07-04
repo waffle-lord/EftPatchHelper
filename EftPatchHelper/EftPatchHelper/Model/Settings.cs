@@ -42,6 +42,18 @@ namespace EftPatchHelper.Model
         [JsonPropertyName("giteaReleaseRepoName")]
         public string GiteaReleaseRepoName { get; set; } = "";
 
+        [JsonPropertyName("meagEmail")]
+        public string MegaEmail { get; set; } = "";
+
+        [JsonPropertyName("megaPassword")]
+        public string MegaPassword { get; set; } = "";
+
+        [JsonPropertyName("megaUploadFolder")]
+        public string MegaUploadFolder { get; set; } = "";
+
+        [JsonPropertyName("goFileApiKey")]
+        public string GoFileApiKey { get; set; } = "";
+
         public bool Save()
         {
             try
@@ -74,6 +86,22 @@ namespace EftPatchHelper.Model
             if (string.IsNullOrWhiteSpace(GiteaReleaseRepoName)) return false;
 
             if (string.IsNullOrWhiteSpace(GiteaApiKey)) return false;
+
+            return true;
+        }
+
+        public bool UsingMega()
+        {
+            if (string.IsNullOrWhiteSpace(MegaEmail)) return false;
+
+            if (string.IsNullOrWhiteSpace(MegaPassword)) return false;
+
+            return true;
+        }
+
+        public bool UsingGoFile()
+        {
+            if (string.IsNullOrWhiteSpace(GoFileApiKey)) return false;
 
             return true;
         }

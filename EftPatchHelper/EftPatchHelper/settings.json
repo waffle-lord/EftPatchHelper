@@ -9,5 +9,9 @@
   "giteaApiBasePath": "", //You can leave the gitea settings blank if you don't need to create releases on gitea
   "giteaApiKey": "",
   "giteaReleaseRepoOwner": "",
-  "giteaReleaseRepoName": ""
+  "giteaReleaseRepoName": "",
+  "megaEmail": "",
+  "megaPassword": "",
+  "megaUploadFolder":  "",
+  "goFileApiKey": ""
 }

@@ -21,14 +21,14 @@ namespace EftPatchHelper.Tasks
 
         private bool ChangeSettingsTargetVersion()
         {
-            var targetClient = _clientSelector.GetClientSelection("Select [yellow]Target[/] Version");
+            _options.TargetClient = _clientSelector.GetClientSelection("Select [yellow]Target[/] Version");
 
             AnsiConsole.WriteLine();
-            ConfirmationPrompt changeVersion = new ConfirmationPrompt($"Update settings target version to use [purple]{targetClient.Version}[/]?");
+            ConfirmationPrompt changeVersion = new ConfirmationPrompt($"Update settings target version to use [purple]{_options.TargetClient.Version}[/]?");
 
             if (changeVersion.Show(AnsiConsole.Console))
             {
-                _settings.TargetEftVersion = targetClient.Version;
+                _settings.TargetEftVersion = _options.TargetClient.Version;
 
                 return _settings.Save();
             }

@@ -28,5 +28,15 @@ namespace EftPatchHelper.Model
         /// Whether or not the user opted to create a release on gitea
         /// </summary>
         public bool CreateRelease = false;
+
+        /// <summary>
+        /// Whether or not to upload the patcher to gofile.io
+        /// </summary>
+        public bool UploadToGoFile = false;
+
+        /// <summary>
+        /// Whether or not to upload the pather to mega.io
+        /// </summary>
+        public bool UploadToMega = false;
     }
 }
