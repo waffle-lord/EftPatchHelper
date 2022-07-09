@@ -46,8 +46,16 @@ namespace EftPatchHelper.Tasks
 
             foreach (var pair in _options.MirrorList)
             {
-                // value is the link, key is the hub entry text
-                output += $"\n<p><a href=\"{pair.Value}\">{pair.Key}</a></p>";
+                var displayText = pair.Key;
+                var link = pair.Value;
+
+                if(link.Contains("gofile.io/download/direct/"))
+                {
+                    // gofile direct link is only for the mirror list, the hub entry should use the normal link
+                    link = link.Replace("gofile.io/download/direct/", "gofile.io/download/");
+                }
+
+                output += $"\n<p><a href=\"{link}\">{displayText}</a></p>";
             }
 
             AnsiConsole.WriteLine(output);
