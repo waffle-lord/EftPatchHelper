@@ -9,6 +9,8 @@ namespace EftPatchHelper.Interfaces
     public interface IFileUpload
     {
         public string DisplayName { get; set; }
+        public string ServiceName { get; set; }
+        public string HubEntryText { get; set; }
         public string GetLink();
         public Task<bool> UploadAsync(IProgress<double>? progress = null);
     }

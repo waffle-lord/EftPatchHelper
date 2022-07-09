@@ -10,17 +10,21 @@ namespace EftPatchHelper.Model
         private GoFileFile _uploadedFile;
 
         public string DisplayName { get; set; }
+        public string ServiceName { get; set; }
+        public string HubEntryText { get; set; }
 
         public GoFileUpload(FileInfo file, string apiToken)
         {
             GoFile.ApiToken = apiToken;
             _file = file;
-            DisplayName = $"GoFile Upload: {_file.Name}";
+            ServiceName = "GoFile";
+            DisplayName = $"{ServiceName} Upload: {_file.Name}";
+            HubEntryText = $"Download from {ServiceName}";
         }
 
         public string GetLink()
         {
-            return _uploadedFile.Link;
+            return _uploadedFile.DirectLink;
         }
 
         public async Task<bool> UploadAsync(IProgress<double>? progress = null)

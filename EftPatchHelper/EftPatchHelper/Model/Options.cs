@@ -38,5 +38,10 @@ namespace EftPatchHelper.Model
         /// Whether or not to upload the pather to mega.io
         /// </summary>
         public bool UploadToMega = false;
+
+        /// <summary>
+        /// List of mirrors to upload to Gitea
+        /// </summary>
+        public Dictionary<string, string> MirrorList = new Dictionary<string, string>();
     }
 }

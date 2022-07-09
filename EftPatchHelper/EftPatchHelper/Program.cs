@@ -39,8 +39,8 @@ namespace EftPatchHelper
             IFileProcessingTasks fileProcessingTasks,
             IPatchGenTasks patchGenTasks,
             IPatchTestingTasks patchTestingTasks,
-            IReleaseCreator createReleaseTasks,
-            IUploadTasks uploadTasks
+            IUploadTasks uploadTasks,
+            IReleaseCreator createReleaseTasks
             )
         {
             _settingsTasks = settingsTasks;
@@ -59,8 +59,8 @@ namespace EftPatchHelper
             _fileProcessingTasks.Run();
             _patchGenTasks.Run();
             _patchTestingTasks.Run();
-            _createReleaseTasks.Run();
             _uploadTasks.Run();
+            _createReleaseTasks.Run();
         }
 
         private static IHost ConfigureHost(string[] args)

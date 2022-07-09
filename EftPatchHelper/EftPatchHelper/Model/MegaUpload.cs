@@ -15,6 +15,8 @@ namespace EftPatchHelper.Model
         private INode _uploadedFile;
 
         public string DisplayName { get; set; }
+        public string ServiceName { get; set; }
+        public string HubEntryText { get; set; }
 
         public MegaUpload(FileInfo file, string email, string password, string mfaKey = null)
         {
@@ -22,7 +24,9 @@ namespace EftPatchHelper.Model
             _file = file;
             _email = email;
             _password = password;
-            DisplayName = $"Mega Upload: {_file.Name}";
+            ServiceName = "Mega";
+            DisplayName = $"{ServiceName} Upload: {_file.Name}";
+            HubEntryText = $"Download from {ServiceName}";
         }
 
         private async Task<bool> CheckLoginStatus()

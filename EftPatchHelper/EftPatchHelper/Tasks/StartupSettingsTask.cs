@@ -62,14 +62,9 @@ namespace EftPatchHelper.Tasks
         {
             _options.IgnoreExistingDirectories = new ConfirmationPrompt("Skip existing directories? (you will be prompted if no)").Show(AnsiConsole.Console);
 
-            if (!_settings.UsingGitea()) return;
-
-            _options.CreateRelease = new ConfirmationPrompt("Create a release on gitea?").Show(AnsiConsole.Console);
-
-            if(_options.CreateRelease)
+            if (_settings.UsingGitea())
             {
-                // only allow upload options if the release is not being made
-                return;
+                _options.CreateRelease = new ConfirmationPrompt("Create a release on gitea?").Show(AnsiConsole.Console);
             }
 
             if (_settings.UsingMega())

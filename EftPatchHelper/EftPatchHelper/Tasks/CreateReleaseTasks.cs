@@ -5,6 +5,7 @@ using Gitea.Model;
 using Gitea.Client;
 using Spectre.Console;
 using EftPatchHelper.Extensions;
+using System.Text.Json;
 
 namespace EftPatchHelper.Tasks
 {
@@ -81,6 +82,19 @@ namespace EftPatchHelper.Tasks
             }
         }
 
+        public bool CreateMirrorList(FileInfo mirrorListFileInfo)
+        {
+            List<string> mirrors = _options.MirrorList.Values.ToList();
+
+            string json = JsonSerializer.Serialize(mirrors, new JsonSerializerOptions() { WriteIndented = true });
+
+            File.WriteAllText(mirrorListFileInfo.FullName, json);
+
+            mirrorListFileInfo.Refresh();
+
+            return mirrorListFileInfo.Exists;
+        }
+
         public void Run()
         {
             AnsiConsole.WriteLine();
@@ -93,9 +107,11 @@ namespace EftPatchHelper.Tasks
 
             var repo = new RepositoryApi(Configuration.Default);
 
-            var release = MakeRelease(repo).ValidateOrExit<Release>();
+            var fileInfo = new FileInfo(Path.Join(Environment.CurrentDirectory, "mirrors.json"));
 
-            var fileInfo = new FileInfo(_options.OutputPatchPath + ".zip");
+            CreateMirrorList(fileInfo);
+
+            var release = MakeRelease(repo).ValidateOrExit<Release>();
 
             UploadAsset(fileInfo, release, repo);
         }

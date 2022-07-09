@@ -24,6 +24,12 @@ namespace EftPatchHelper.Tasks
 
             if (!patcherFile.Exists) return false;
 
+            if(_settings.UsingGoFile() && _options.UploadToGoFile)
+            {
+                var gofile = new GoFileUpload(patcherFile, _settings.GoFileApiKey);
+                _fileUploads.Add(gofile);
+            }
+
             if (_settings.UsingMega() && _options.UploadToMega)
             {
                 var mega = new MegaUpload(patcherFile, _settings.MegaEmail, _settings.MegaPassword);
@@ -31,45 +37,17 @@ namespace EftPatchHelper.Tasks
                 _fileUploads.Add(mega);
             }
 
-            if(_settings.UsingGoFile() && _options.UploadToGoFile)
-            {
-                var gofile = new GoFileUpload(patcherFile, _settings.GoFileApiKey);
-                _fileUploads.Add(gofile);
-            }
-
             return true;
         }
 
         private void CreateHubEntrySource()
         {
-            var goFile = _fileUploads.SingleOrDefault(x => x.GetType() == typeof(GoFileUpload));
-            var mega = _fileUploads.SingleOrDefault(x => x.GetType() == typeof(MegaUpload));
-
-            if(goFile == null || mega == null)
-            {
-                AnsiConsole.WriteLine("Failed to get required info to create hub entry source");
-                return;
-            }
-
-            var goFileLink = goFile.GetLink();
-            var megaLink = mega.GetLink();
-
-            if(goFileLink == null || megaLink == null)
-            {
-                AnsiConsole.WriteLine("Failed to get link for uploaded files");
-                return;
-            }
-
             string output = $"<p>Downgrade EFT Client files from version {_options.SourceClient.Version} to {_options.TargetClient.Version}</p>\n<p><br></p>";
 
-            if(_options.UploadToGoFile)
+            foreach (var pair in _options.MirrorList)
             {
-                output += $"\n<p><a href=\"{goFileLink}\">Download From GoFile</a></p>";
-            }
-
-            if(_options.UploadToMega)
-            {
-                output += $"\n<p><a href=\"{megaLink}\">Download From Mega</a></p>";
+                // value is the link, key is the hub entry text
+                output += $"\n<p><a href=\"{pair.Value}\">{pair.Key}</a></p>";
             }
 
             AnsiConsole.WriteLine(output);
@@ -124,6 +102,10 @@ namespace EftPatchHelper.Tasks
                             AnsiConsole.MarkupLine($"[red]{pair.Key.DisplayName.EscapeMarkup()} failed[/]");
                             return false;
                         }
+                        else
+                        {
+                            _options.MirrorList.Add(pair.Key.HubEntryText, pair.Key.GetLink());
+                        }
                     }
 
                     return true;
@@ -134,10 +116,9 @@ namespace EftPatchHelper.Tasks
 
         public void Run()
         {
-            if (!_options.CreateRelease)
-            {
-                UploadAllFiles().GetAwaiter().GetResult().ValidateOrExit();
-            }
+            if (!_options.UploadToGoFile && !_options.UploadToMega) return;
+
+            UploadAllFiles().GetAwaiter().GetResult().ValidateOrExit();
 
             CreateHubEntrySource();
         }
