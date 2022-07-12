@@ -6,7 +6,7 @@ namespace EftPatchHelper.Model
 {
     public class MegaUpload : IFileUpload, IDisposable
     {
-        private FileInfo _file;
+        public FileInfo UploadFileInfo { get; private set; }
         private MegaApiClient _client;
         private string _email;
         private string _password;
@@ -21,11 +21,11 @@ namespace EftPatchHelper.Model
         public MegaUpload(FileInfo file, string email, string password, string mfaKey = null)
         {
             _client = new MegaApiClient();
-            _file = file;
+            UploadFileInfo = file;
             _email = email;
             _password = password;
             ServiceName = "Mega";
-            DisplayName = $"{ServiceName} Upload: {_file.Name}";
+            DisplayName = $"{ServiceName} Upload: {UploadFileInfo.Name}";
             HubEntryText = $"Download from {ServiceName}";
         }
 
@@ -76,18 +76,18 @@ namespace EftPatchHelper.Model
 
         public async Task<bool> UploadAsync(IProgress<double>? progress = null)
         {
-            _file.Refresh();
+            UploadFileInfo.Refresh();
 
-            if (!_file.Exists) return false;
+            if (!UploadFileInfo.Exists) return false;
 
             if(!await CheckLoginStatus())
             {
                 return false;
             }
 
-            using var fileStream = _file.OpenRead();
+            using var fileStream = UploadFileInfo.OpenRead();
 
-            _uploadedFile = await _client.UploadAsync(fileStream, _file.Name, _uploadFolder, progress);
+            _uploadedFile = await _client.UploadAsync(fileStream, UploadFileInfo.Name, _uploadFolder, progress);
 
             return _uploadedFile != null;
         }

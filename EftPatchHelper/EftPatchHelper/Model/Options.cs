@@ -42,6 +42,6 @@ namespace EftPatchHelper.Model
         /// <summary>
         /// List of mirrors to upload to Gitea
         /// </summary>
-        public Dictionary<string, string> MirrorList = new Dictionary<string, string>();
+        public Dictionary<string, DownloadMirror> MirrorList = new Dictionary<string, DownloadMirror>();
     }
 }

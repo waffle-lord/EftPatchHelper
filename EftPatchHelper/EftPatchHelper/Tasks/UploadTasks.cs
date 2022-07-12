@@ -2,6 +2,7 @@
 using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
 using Spectre.Console;
+using System.Security.Cryptography;
 
 namespace EftPatchHelper.Tasks
 {
@@ -16,6 +17,17 @@ namespace EftPatchHelper.Tasks
         {
             _options = options;
             _settings = settings;
+        }
+
+        private static string GetFileHash(FileInfo file)
+        {
+            using (MD5 md5Service = MD5.Create())
+            using (var sourceStream = file.OpenRead())
+            {
+                byte[] sourceHash = md5Service.ComputeHash(sourceStream);
+
+                return Convert.ToBase64String(sourceHash);
+            }
         }
 
         private async Task<bool> BuildUploadList()
@@ -47,7 +59,7 @@ namespace EftPatchHelper.Tasks
             foreach (var pair in _options.MirrorList)
             {
                 var displayText = pair.Key;
-                var link = pair.Value;
+                var link = pair.Value.Link;
 
                 if(link.Contains("gofile.io/download/direct/"))
                 {
@@ -112,7 +124,13 @@ namespace EftPatchHelper.Tasks
                         }
                         else
                         {
-                            _options.MirrorList.Add(pair.Key.HubEntryText, pair.Key.GetLink());
+                            DownloadMirror mirror = new DownloadMirror()
+                            {
+                                Link = pair.Key.GetLink(),
+                                Hash = GetFileHash(pair.Key.UploadFileInfo)
+                            };
+
+                            _options.MirrorList.Add(pair.Key.HubEntryText, mirror);
                         }
                     }
 

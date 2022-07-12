@@ -84,7 +84,7 @@ namespace EftPatchHelper.Tasks
 
         public bool CreateMirrorList(FileInfo mirrorListFileInfo)
         {
-            List<string> mirrors = _options.MirrorList.Values.ToList();
+            List<DownloadMirror> mirrors = _options.MirrorList.Values.ToList();
 
             string json = JsonSerializer.Serialize(mirrors, new JsonSerializerOptions() { WriteIndented = true });
 
@@ -99,6 +99,10 @@ namespace EftPatchHelper.Tasks
         {
             AnsiConsole.WriteLine();
 
+            var fileInfo = new FileInfo(Path.Join(Environment.CurrentDirectory, "mirrors.json"));
+
+            CreateMirrorList(fileInfo);
+
             if (!_options.CreateRelease) return;
 
             Configuration.Default.BasePath = _settings.GiteaApiBasePath;
@@ -106,10 +110,6 @@ namespace EftPatchHelper.Tasks
             Configuration.Default.AddApiKey("token", _settings.GiteaApiKey);
 
             var repo = new RepositoryApi(Configuration.Default);
-
-            var fileInfo = new FileInfo(Path.Join(Environment.CurrentDirectory, "mirrors.json"));
-
-            CreateMirrorList(fileInfo);
 
             var release = MakeRelease(repo).ValidateOrExit<Release>();
 

@@ -6,7 +6,7 @@ namespace EftPatchHelper.Model
 {
     public class GoFileUpload : IFileUpload
     {
-        private FileInfo _file;
+        public FileInfo UploadFileInfo { get; private set; }
         private GoFileFile _uploadedFile;
 
         public string DisplayName { get; set; }
@@ -16,9 +16,9 @@ namespace EftPatchHelper.Model
         public GoFileUpload(FileInfo file, string apiToken)
         {
             GoFile.ApiToken = apiToken;
-            _file = file;
+            UploadFileInfo = file;
             ServiceName = "GoFile";
-            DisplayName = $"{ServiceName} Upload: {_file.Name}";
+            DisplayName = $"{ServiceName} Upload: {UploadFileInfo.Name}";
             HubEntryText = $"Download from {ServiceName}";
         }
 
@@ -29,7 +29,7 @@ namespace EftPatchHelper.Model
 
         public async Task<bool> UploadAsync(IProgress<double>? progress = null)
         {
-            var uploadedFile = await GoFile.UploadFileAsync(_file, progress);
+            var uploadedFile = await GoFile.UploadFileAsync(UploadFileInfo, progress);
 
             if(uploadedFile == null) return false;
 
