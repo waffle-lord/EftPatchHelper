@@ -42,7 +42,7 @@ namespace EftPatchHelper.Model
         [JsonPropertyName("giteaReleaseRepoName")]
         public string GiteaReleaseRepoName { get; set; } = "";
 
-        [JsonPropertyName("meagEmail")]
+        [JsonPropertyName("megaEmail")]
         public string MegaEmail { get; set; } = "";
 
         [JsonPropertyName("megaPassword")]
