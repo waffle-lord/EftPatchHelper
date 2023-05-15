@@ -33,6 +33,11 @@ namespace EftPatchHelper.Model
 
             if(uploadedFile == null) return false;
 
+            if(!await uploadedFile.SetDirectLink(true))
+            {
+                return false;
+            }
+
             _uploadedFile = uploadedFile;
 
             return true;
