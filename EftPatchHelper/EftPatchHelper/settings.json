@@ -12,6 +12,7 @@
   "giteaReleaseRepoName": "",
   "megaEmail": "",
   "megaPassword": "",
-  "megaUploadFolder":  "",
-  "goFileApiKey": ""
+  "megaUploadFolder": "",
+  "goFileApiKey": "",
+  "goFileFolderId": ""
 }

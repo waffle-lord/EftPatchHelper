@@ -38,7 +38,7 @@ namespace EftPatchHelper.Tasks
 
             if(_settings.UsingGoFile() && _options.UploadToGoFile)
             {
-                var gofile = new GoFileUpload(patcherFile, _settings.GoFileApiKey);
+                var gofile = new GoFileUpload(patcherFile, _settings.GoFileApiKey, _settings.GoFileFolderId);
                 _fileUploads.Add(gofile);
             }
 
