@@ -54,6 +54,9 @@ namespace EftPatchHelper.Model
         [JsonPropertyName("goFileApiKey")]
         public string GoFileApiKey { get; set; } = "";
 
+        [JsonPropertyName("goFileFolderId")]
+        public string GoFileFolderId { get; set; } = "";
+
         public bool Save()
         {
             try
@@ -102,6 +105,8 @@ namespace EftPatchHelper.Model
         public bool UsingGoFile()
         {
             if (string.IsNullOrWhiteSpace(GoFileApiKey)) return false;
+
+            if(string.IsNullOrWhiteSpace(GoFileFolderId)) return false;
 
             return true;
         }
