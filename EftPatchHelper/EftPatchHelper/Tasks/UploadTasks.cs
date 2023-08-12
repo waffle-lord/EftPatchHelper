@@ -87,6 +87,17 @@ namespace EftPatchHelper.Tasks
             }
         }
 
+        static string BytesToString(long byteCount)
+        {
+            string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
+            if (byteCount == 0)
+                return "0" + suf[0];
+            long bytes = Math.Abs(byteCount);
+            int place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
+            double num = Math.Round(bytes / Math.Pow(1024, place), 1);
+            return (Math.Sign(byteCount) * num).ToString() + suf[place];
+        }
+
         private async Task<bool> UploadAllFiles()
         {
             if(!await BuildUploadList())
@@ -98,13 +109,14 @@ namespace EftPatchHelper.Tasks
                 new TaskDescriptionColumn() { Alignment = Justify.Left},
                 new ProgressBarColumn(),
                 new PercentageColumn(),
+                new TransferSpeedColumn(),
                 new RemainingTimeColumn(),
                 new SpinnerColumn(Spinner.Known.Dots2)
                 ).StartAsync<bool>(async context => 
                 {
                     foreach(var file in _fileUploads)
                     {
-                        var task = context.AddTask($"[purple][[Pending]][/] {file.DisplayName}");
+                        var task = context.AddTask($"[purple][[Pending]][/] {file.DisplayName} - [blue]{BytesToString(file.UploadFileInfo.Length)}[/]");
                         task.IsIndeterminate = true;
                         uploadTasks.Add(file, task);
                     }
@@ -115,7 +127,7 @@ namespace EftPatchHelper.Tasks
                         var progress = new System.Progress<double>((d) => pair.Value.Value = d);
 
                         pair.Value.IsIndeterminate = false;
-                        pair.Value.Description = pair.Key.DisplayName;
+                        pair.Value.Description = $"{pair.Key.DisplayName} - [blue]{BytesToString(pair.Key.UploadFileInfo.Length)}[/]";
 
                         if(!await pair.Key.UploadAsync(progress))
                         {
