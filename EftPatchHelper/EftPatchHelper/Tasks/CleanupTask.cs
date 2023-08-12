@@ -66,8 +66,6 @@ namespace EftPatchHelper.Tasks
                     ctx.Refresh();
                 }
             });
-
-            AnsiConsole.Write(new Rule());
         }
 
         public void Run()

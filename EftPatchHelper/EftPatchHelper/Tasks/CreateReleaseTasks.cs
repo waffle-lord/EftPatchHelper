@@ -105,10 +105,6 @@ namespace EftPatchHelper.Tasks
 
             if (!_options.CreateRelease) return;
 
-            Configuration.Default.BasePath = _settings.GiteaApiBasePath;
-
-            Configuration.Default.AddApiKey("token", _settings.GiteaApiKey);
-
             var repo = new RepositoryApi(Configuration.Default);
 
             var release = MakeRelease(repo).ValidateOrExit<Release>();

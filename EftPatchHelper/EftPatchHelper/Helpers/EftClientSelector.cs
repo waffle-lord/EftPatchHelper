@@ -75,14 +75,20 @@ namespace EftPatchHelper.Helpers
             }
         }
 
-        public EftClient GetClientSelection(string Prompt)
+        public EftClient GetClientSelection(string Prompt, string currentReleaseVersion = "")
         {
             SelectionPrompt<EftClient> clientPrompt = new SelectionPrompt<EftClient>()
             {
                 Title = Prompt,
                 MoreChoicesText = "Move cursor to see more versions",
                 PageSize = 10,
-                Converter = (x) => x.DisplayName
+                Converter = (x) =>
+                {
+                    if (!string.IsNullOrWhiteSpace(currentReleaseVersion) && x.Version.EndsWith(currentReleaseVersion))
+                        return $"{x.DisplayName} - Latest Release";
+
+                    return x.DisplayName;
+                }
             };
 
             clientPrompt.AddChoices(_clientList);

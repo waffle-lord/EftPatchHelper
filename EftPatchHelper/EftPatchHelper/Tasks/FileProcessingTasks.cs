@@ -44,6 +44,8 @@ namespace EftPatchHelper.Tasks
 
         public void Run()
         {
+            AnsiConsole.Write(new Rule("Starting Tasks, this will take some time :)"));
+
             BackupClients().ValidateOrExit();
 
             CopyData(_options.SourceClient, "[gray]Copying[/] [blue]source[/][gray] to prep area ...[/]").ValidateOrExit();

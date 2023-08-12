@@ -2,6 +2,7 @@
 using EftPatchHelper.Helpers;
 using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
+using Gitea.Api;
 using Spectre.Console;
 
 namespace EftPatchHelper.Tasks
@@ -19,9 +20,9 @@ namespace EftPatchHelper.Tasks
             _clientSelector = clientSelector;
         }
 
-        private bool ChangeSettingsTargetVersion()
+        private bool ChangeSettingsTargetVersion(string currentReleaseVersion)
         {
-            _options.TargetClient = _clientSelector.GetClientSelection("Select [yellow]Target[/] Version");
+            _options.TargetClient = _clientSelector.GetClientSelection("Select [yellow]Target[/] Version", currentReleaseVersion);
 
             AnsiConsole.WriteLine();
             ConfirmationPrompt changeVersion = new ConfirmationPrompt($"Update settings target version to use [purple]{_options.TargetClient.Version}[/]?");
@@ -36,13 +37,13 @@ namespace EftPatchHelper.Tasks
             return true;
         }
 
-        private bool ConfirmExistingTargetVersion()
+        private bool ConfirmExistingTargetVersion(string currentReleaseVersion)
         {
             _clientSelector.LoadClientList();
 
             _options.TargetClient = _clientSelector.GetClient(_settings.TargetEftVersion);
 
-            ConfirmationPrompt confirmTarget = new ConfirmationPrompt($"Use version [purple]{_settings.TargetEftVersion}[/] as target?");
+            ConfirmationPrompt confirmTarget = new ConfirmationPrompt($"Use version [purple]{_settings.TargetEftVersion}[/] {(_options.TargetClient.Version.EndsWith(currentReleaseVersion) ? " ([green]latest release[/])" : "")} as target?");
 
             // If client is null or requested change, return false to ensure change settings target is called.
             return _options.TargetClient == null || !confirmTarget.Show(AnsiConsole.Console);
@@ -55,11 +56,33 @@ namespace EftPatchHelper.Tasks
             return _options.SourceClient != null;
         }
 
+        private string GetCurrentReleaseVersion()
+        {
+            if (!_settings.UsingGitea())
+                return "";
+
+            return AnsiConsole.Status().Start("Starting...", ctx => 
+            {
+                RepositoryApi repo = new RepositoryApi();
+
+                ctx.Spinner = Spinner.Known.Dots8;
+                ctx.Status = "Getting latest release ...";
+
+                var releases = repo.RepoListReleases("SPT-AKI", "Stable-releases");
+
+                var release = releases.First(x => !x.Prerelease).Name.Split('(')[1];
+
+                return release.Remove(release.Length - 1);
+            });
+        }
+
         public void Run()
         {
-            if (ConfirmExistingTargetVersion())
+            var currentReleaseVersion = GetCurrentReleaseVersion();
+
+            if (ConfirmExistingTargetVersion(currentReleaseVersion))
             {
-                ChangeSettingsTargetVersion().ValidateOrExit();
+                ChangeSettingsTargetVersion(currentReleaseVersion).ValidateOrExit();
             }
 
             SelectSourceVersion().ValidateOrExit();
