@@ -14,6 +14,7 @@ namespace EftPatchHelper
     {
         ITaskable _settingsTasks;
         ITaskable _clientSelectionTasks;
+        ITaskable _cleanupTasks;
         ITaskable _fileProcessingTasks;
         ITaskable _patchGenTasks;
         ITaskable _patchTestingTasks;
@@ -36,6 +37,7 @@ namespace EftPatchHelper
         public Program(
             ISettingsTask settingsTasks,
             IClientSelectionTask clientSelectionTasks,
+            ICleanupTask cleanupTasks,
             IFileProcessingTasks fileProcessingTasks,
             IPatchGenTasks patchGenTasks,
             IPatchTestingTasks patchTestingTasks,
@@ -45,6 +47,7 @@ namespace EftPatchHelper
         {
             _settingsTasks = settingsTasks;
             _clientSelectionTasks = clientSelectionTasks;
+            _cleanupTasks = cleanupTasks;
             _fileProcessingTasks = fileProcessingTasks;
             _patchGenTasks = patchGenTasks;
             _patchTestingTasks = patchTestingTasks;
@@ -56,6 +59,7 @@ namespace EftPatchHelper
         {
             _settingsTasks.Run();
             _clientSelectionTasks.Run();
+            _cleanupTasks.Run();
             _fileProcessingTasks.Run();
             _patchGenTasks.Run();
             _patchTestingTasks.Run();
@@ -79,6 +83,7 @@ namespace EftPatchHelper
                 services.AddScoped<EftClientSelector>();
 
                 services.AddTransient<ISettingsTask, StartupSettingsTask>();
+                services.AddTransient<ICleanupTask, CleanupTask>();
                 services.AddTransient<IClientSelectionTask, ClientSelectionTask>();
                 services.AddTransient<IFileProcessingTasks, FileProcessingTasks>();
                 services.AddTransient<IPatchGenTasks, PatchGenTasks>();
