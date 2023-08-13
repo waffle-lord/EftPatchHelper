@@ -109,7 +109,6 @@ namespace EftPatchHelper.Tasks
                 new TaskDescriptionColumn() { Alignment = Justify.Left},
                 new ProgressBarColumn(),
                 new PercentageColumn(),
-                new TransferSpeedColumn(),
                 new RemainingTimeColumn(),
                 new SpinnerColumn(Spinner.Known.Dots2)
                 ).StartAsync<bool>(async context => 
