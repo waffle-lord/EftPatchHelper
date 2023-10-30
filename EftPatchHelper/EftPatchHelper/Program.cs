@@ -1,4 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
+
+using System.Reflection;
 using EftPatchHelper.Helpers;
 using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
@@ -26,6 +28,8 @@ namespace EftPatchHelper
             Console.OutputEncoding = System.Text.Encoding.UTF8;
 
             AnsiConsole.Write(new FigletText("EFT Patch Helper").Centered().Color(Color.Blue));
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            AnsiConsole.Write(new Rule($"[purple]v{version}[/]").Centered().RuleStyle("blue"));
 
             var host = ConfigureHost(args);
             host.Services.GetRequiredService<Program>().Run();

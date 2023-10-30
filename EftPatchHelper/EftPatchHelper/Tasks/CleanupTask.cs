@@ -23,7 +23,7 @@ namespace EftPatchHelper.Tasks
 
             foreach (var prepFolder in prepFolders)
             {
-                if (prepFolder == _options.TargetClient.PrepPath)
+                if (prepFolder == _options.TargetClient.PrepPath && !File.Exists(Path.Join(prepFolder, "Patcher.exe")))
                     continue;
 
                 _fileToRemove.Add(new DirectoryInfo(prepFolder));
