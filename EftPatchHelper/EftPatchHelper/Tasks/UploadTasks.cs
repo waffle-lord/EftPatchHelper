@@ -131,7 +131,6 @@ namespace EftPatchHelper.Tasks
                         if(!await pair.Key.UploadAsync(progress))
                         {
                             AnsiConsole.MarkupLine($"[red]{pair.Key.DisplayName.EscapeMarkup()} failed[/]");
-                            return false;
                         }
                         else
                         {
@@ -145,7 +144,7 @@ namespace EftPatchHelper.Tasks
                         }
                     }
 
-                    return true;
+                    return _options.MirrorList.Count > 0;
                 });
 
             return succeeded;
