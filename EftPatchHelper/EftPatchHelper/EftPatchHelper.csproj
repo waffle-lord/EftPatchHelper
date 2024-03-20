@@ -25,6 +25,9 @@
     <Reference Include="Gitea">
       <HintPath>Resources\Gitea.dll</HintPath>
     </Reference>
+    <Reference Include="WinSCPnet">
+      <HintPath>Resources\WinSCPnet.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

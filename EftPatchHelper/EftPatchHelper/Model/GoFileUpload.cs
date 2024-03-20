@@ -18,6 +18,7 @@ namespace EftPatchHelper.Model
         public string DisplayName { get; set; }
         public string ServiceName { get; set; }
         public string HubEntryText { get; set; }
+        public bool AddHubEntry { get; }
 
         public GoFileUpload(FileInfo file, string apiToken, string folderId)
         {
@@ -31,6 +32,7 @@ namespace EftPatchHelper.Model
             ServiceName = "GoFile";
             DisplayName = $"{ServiceName} Upload: {UploadFileInfo.Name}";
             HubEntryText = $"Download from {ServiceName}";
+            AddHubEntry = true;
         }
 
         public string GetLink()
