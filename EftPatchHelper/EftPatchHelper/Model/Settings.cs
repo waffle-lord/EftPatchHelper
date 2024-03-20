@@ -57,6 +57,9 @@ namespace EftPatchHelper.Model
         [JsonPropertyName("goFileFolderId")]
         public string GoFileFolderId { get; set; } = "";
 
+        [JsonPropertyName("sftpUploads")] 
+        public List<SftpUploadInfo> SftpUploads { get; set; } = new();
+
         public bool Save()
         {
             try

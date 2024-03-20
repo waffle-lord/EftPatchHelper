@@ -14,5 +14,18 @@
   "megaPassword": "",
   "megaUploadFolder": "",
   "goFileApiKey": "",
-  "goFileFolderId": ""
+  "goFileFolderId": "",
+  "sftpUploads": [
+    {
+      "username": "example-remove-before-using",
+      "password": "password123",
+      "hostKey": "ssh-ed12345 SLKDJFK3928D2LDKFJ2",
+      "hostname": "sftp.slugma-ligma.com",
+      "port": 12345,
+      "uploadPath": "/public/patchers",
+      "httpPath": "https://mirror.slugma-ligma.com/patchers"
+    }
+  ]
 }
+
+

@@ -58,7 +58,7 @@ public class SftpUpload : IFileUpload
 
             session.Open(_sessionOptions);
 
-            session.PutFile(uploadStream, _sftpInfo.uploadPath, transferOptions);
+            session.PutFile(uploadStream, _sftpInfo.UploadPath, transferOptions);
             
             return Task.FromResult(true);
         }

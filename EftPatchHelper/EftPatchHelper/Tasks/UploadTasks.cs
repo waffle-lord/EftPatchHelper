@@ -34,7 +34,10 @@ namespace EftPatchHelper.Tasks
         {
             var patcherFile = new FileInfo(_options.OutputPatchPath + ".zip");
 
-            if (!patcherFile.Exists) return false;
+            if (!patcherFile.Exists)
+            {
+                return false;
+            }
 
             if(_settings.UsingGoFile() && _options.UploadToGoFile)
             {
@@ -47,6 +50,16 @@ namespace EftPatchHelper.Tasks
                 var mega = new MegaUpload(patcherFile, _settings.MegaEmail, _settings.MegaPassword);
                 await mega.SetUploadFolder(_settings.MegaUploadFolder);
                 _fileUploads.Add(mega);
+            }
+
+            foreach (var sftpInfo in _settings.SftpUploads)
+            {
+                if (!sftpInfo.Validate())
+                {
+                    continue;
+                }
+                
+                _fileUploads.Add(new SftpUpload(patcherFile, sftpInfo));
             }
 
             return true;
