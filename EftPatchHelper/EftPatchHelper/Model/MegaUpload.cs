@@ -17,6 +17,8 @@ namespace EftPatchHelper.Model
         public string DisplayName { get; set; }
         public string ServiceName { get; set; }
         public string HubEntryText { get; set; }
+        public bool AddHubEntry { get; }
+
 
         public MegaUpload(FileInfo file, string email, string password, string mfaKey = null)
         {
@@ -27,6 +29,7 @@ namespace EftPatchHelper.Model
             ServiceName = "Mega";
             DisplayName = $"{ServiceName} Upload: {UploadFileInfo.Name}";
             HubEntryText = $"Download from {ServiceName}";
+            AddHubEntry = true;
         }
 
         private async Task<bool> CheckLoginStatus()

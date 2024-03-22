@@ -80,6 +80,12 @@ namespace EftPatchHelper.Tasks
             {
                 _options.UploadToGoFile = new ConfirmationPrompt("Upload to GoFile?").Show(AnsiConsole.Console);
             }
+
+            if (_settings.SftpUploads.Count > 0)
+            {
+                _options.UploadToSftpSites =
+                    new ConfirmationPrompt($"Upload to SFTP sites? ( {_settings.SftpUploads.Count} sites )").Show(AnsiConsole.Console);
+            }
         }
 
         public void Run()

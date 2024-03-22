@@ -5,8 +5,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>1.5.1</AssemblyVersion>
-    <FileVersion>1.5.1</FileVersion>
+    <AssemblyVersion>1.5.3</AssemblyVersion>
+    <FileVersion>1.5.3</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +24,9 @@
   <ItemGroup>
     <Reference Include="Gitea">
       <HintPath>Resources\Gitea.dll</HintPath>
+    </Reference>
+    <Reference Include="WinSCPnet">
+      <HintPath>Resources\WinSCPnet.dll</HintPath>
     </Reference>
   </ItemGroup>
 

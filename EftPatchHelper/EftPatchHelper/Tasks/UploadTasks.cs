@@ -34,12 +34,18 @@ namespace EftPatchHelper.Tasks
         {
             var patcherFile = new FileInfo(_options.OutputPatchPath + ".zip");
 
-            if (!patcherFile.Exists) return false;
+            if (!patcherFile.Exists)
+            {
+                return false;
+            }
+            
+            AnsiConsole.WriteLine("Building mirrors list ...");
 
             if(_settings.UsingGoFile() && _options.UploadToGoFile)
             {
                 var gofile = new GoFileUpload(patcherFile, _settings.GoFileApiKey, _settings.GoFileFolderId);
                 _fileUploads.Add(gofile);
+                AnsiConsole.WriteLine("Added MEGA");
             }
 
             if (_settings.UsingMega() && _options.UploadToMega)
@@ -47,6 +53,21 @@ namespace EftPatchHelper.Tasks
                 var mega = new MegaUpload(patcherFile, _settings.MegaEmail, _settings.MegaPassword);
                 await mega.SetUploadFolder(_settings.MegaUploadFolder);
                 _fileUploads.Add(mega);
+                AnsiConsole.WriteLine("Added MEGA");
+            }
+
+            if (_settings.SftpUploads.Count > 0 && _options.UploadToSftpSites)
+            {
+                foreach (var sftpInfo in _settings.SftpUploads)
+                {
+                    if (!sftpInfo.IsValid())
+                    {
+                        continue;
+                    }
+
+                    AnsiConsole.WriteLine($"Added SFTP: {sftpInfo.Hostname}");
+                    _fileUploads.Add(new SftpUpload(patcherFile, sftpInfo));
+                }
             }
 
             return true;
@@ -58,6 +79,11 @@ namespace EftPatchHelper.Tasks
 
             foreach (var pair in _options.MirrorList)
             {
+                if (!pair.Value.AddHubEntry)
+                {
+                    continue;
+                }
+                
                 var displayText = pair.Key;
                 var link = pair.Value.Link;
 
@@ -90,8 +116,12 @@ namespace EftPatchHelper.Tasks
         static string BytesToString(long byteCount)
         {
             string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
+            
             if (byteCount == 0)
+            {
                 return "0" + suf[0];
+            }
+            
             long bytes = Math.Abs(byteCount);
             int place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
             double num = Math.Round(bytes / Math.Pow(1024, place), 1);
@@ -134,8 +164,9 @@ namespace EftPatchHelper.Tasks
                         }
                         else
                         {
-                            DownloadMirror mirror = new DownloadMirror()
+                            DownloadMirror mirror = new DownloadMirror
                             {
+                                AddHubEntry = pair.Key.AddHubEntry,
                                 Link = pair.Key.GetLink(),
                                 Hash = GetFileHash(pair.Key.UploadFileInfo)
                             };
@@ -152,7 +183,7 @@ namespace EftPatchHelper.Tasks
 
         public void Run()
         {
-            if (!_options.UploadToGoFile && !_options.UploadToMega) return;
+            if (!_options.UploadToGoFile && !_options.UploadToMega && !_options.UploadToSftpSites) return;
 
             UploadAllFiles().GetAwaiter().GetResult().ValidateOrExit();
 

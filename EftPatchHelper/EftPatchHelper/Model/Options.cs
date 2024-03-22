@@ -40,6 +40,11 @@ namespace EftPatchHelper.Model
         public bool UploadToMega = false;
 
         /// <summary>
+        /// Whether or not to upload to all sftp site listing
+        /// </summary>
+        public bool UploadToSftpSites = false;
+
+        /// <summary>
         /// List of mirrors to upload to Gitea
         /// </summary>
         public Dictionary<string, DownloadMirror> MirrorList = new Dictionary<string, DownloadMirror>();
