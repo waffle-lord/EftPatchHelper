@@ -38,11 +38,14 @@ namespace EftPatchHelper.Tasks
             {
                 return false;
             }
+            
+            AnsiConsole.WriteLine("Building mirrors list ...");
 
             if(_settings.UsingGoFile() && _options.UploadToGoFile)
             {
                 var gofile = new GoFileUpload(patcherFile, _settings.GoFileApiKey, _settings.GoFileFolderId);
                 _fileUploads.Add(gofile);
+                AnsiConsole.WriteLine("Added MEGA");
             }
 
             if (_settings.UsingMega() && _options.UploadToMega)
@@ -50,16 +53,21 @@ namespace EftPatchHelper.Tasks
                 var mega = new MegaUpload(patcherFile, _settings.MegaEmail, _settings.MegaPassword);
                 await mega.SetUploadFolder(_settings.MegaUploadFolder);
                 _fileUploads.Add(mega);
+                AnsiConsole.WriteLine("Added MEGA");
             }
 
-            foreach (var sftpInfo in _settings.SftpUploads)
+            if (_settings.SftpUploads.Count > 0 && _options.UploadToSftpSites)
             {
-                if (!sftpInfo.Validate())
+                foreach (var sftpInfo in _settings.SftpUploads)
                 {
-                    continue;
+                    if (!sftpInfo.IsValid())
+                    {
+                        continue;
+                    }
+
+                    AnsiConsole.WriteLine($"Added SFTP: {sftpInfo.Hostname}");
+                    _fileUploads.Add(new SftpUpload(patcherFile, sftpInfo));
                 }
-                
-                _fileUploads.Add(new SftpUpload(patcherFile, sftpInfo));
             }
 
             return true;
@@ -75,7 +83,6 @@ namespace EftPatchHelper.Tasks
                 {
                     continue;
                 }
-                
                 
                 var displayText = pair.Key;
                 var link = pair.Value.Link;
@@ -176,7 +183,7 @@ namespace EftPatchHelper.Tasks
 
         public void Run()
         {
-            if (!_options.UploadToGoFile && !_options.UploadToMega) return;
+            if (!_options.UploadToGoFile && !_options.UploadToMega && !_options.UploadToSftpSites) return;
 
             UploadAllFiles().GetAwaiter().GetResult().ValidateOrExit();
 

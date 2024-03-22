@@ -22,6 +22,8 @@ public class SftpUpload : IFileUpload
         _sessionOptions = new SessionOptions
         {
             Protocol = Protocol.Sftp,
+            UserName = _sftpInfo.Username,
+            Password = _sftpInfo.Password,
             HostName = _sftpInfo.Hostname,
             PortNumber = _sftpInfo.Port,
             SshHostKeyFingerprint = _sftpInfo.HostKey
@@ -40,25 +42,23 @@ public class SftpUpload : IFileUpload
 
     public Task<bool> UploadAsync(IProgress<double>? progress = null)
     {
-        TransferOptions transferOptions = new TransferOptions()
+        TransferOptions transferOptions = new TransferOptions
         {
             TransferMode = TransferMode.Binary,
         };
         
         using Session session = new Session();
-        using var uploadStream = UploadFileInfo.OpenRead();
 
         if (progress != null)
         {
-            session.FileTransferProgress += (_, args) => progress.Report(args.FileProgress);
+            session.FileTransferProgress += (_, args) => progress.Report(Math.Floor(args.FileProgress * 100));
         }
 
         try
         {
-
             session.Open(_sessionOptions);
 
-            session.PutFile(uploadStream, _sftpInfo.UploadPath, transferOptions);
+            session.PutFiles(UploadFileInfo.FullName, $"{_sftpInfo.UploadPath}/{UploadFileInfo.Name}", false, transferOptions).Check();
             
             return Task.FromResult(true);
         }

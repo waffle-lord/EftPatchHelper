@@ -25,24 +25,27 @@ public class SftpUploadInfo
     [JsonPropertyName("httpPath")]
     public string HttpPath { get; set; } = "";
 
-    public bool Validate()
+    public bool IsValid()
     {
-        if (!string.IsNullOrWhiteSpace(Username))
+        if (string.IsNullOrWhiteSpace(Username))
             return false;
         
-        if (!string.IsNullOrWhiteSpace(Password))
+        if (string.IsNullOrWhiteSpace(Password))
+            return false;
+
+        if (string.IsNullOrWhiteSpace(Hostname))
             return false;
         
-        if (!string.IsNullOrWhiteSpace(HostKey))
+        if (string.IsNullOrWhiteSpace(HostKey))
             return false;
         
         if (Port == 0)
             return false;
         
-        if (!string.IsNullOrWhiteSpace(UploadPath))
+        if (string.IsNullOrWhiteSpace(UploadPath))
             return false;
         
-        if (!string.IsNullOrWhiteSpace(HttpPath))
+        if (string.IsNullOrWhiteSpace(HttpPath))
             return false;
 
         return true;
