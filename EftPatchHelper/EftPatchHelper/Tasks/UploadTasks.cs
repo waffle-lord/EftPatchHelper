@@ -32,7 +32,7 @@ namespace EftPatchHelper.Tasks
 
         private async Task<bool> BuildUploadList()
         {
-            var patcherFile = new FileInfo(_options.OutputPatchPath + ".zip");
+            var patcherFile = new FileInfo(_options.OutputPatchPath + ".7z");
 
             if (!patcherFile.Exists)
             {
