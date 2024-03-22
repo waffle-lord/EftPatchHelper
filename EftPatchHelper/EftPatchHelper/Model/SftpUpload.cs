@@ -37,7 +37,14 @@ public class SftpUpload : IFileUpload
     
     public string GetLink()
     {
-        return $"{_sftpInfo.HttpPath}/${UploadFileInfo.Name}";
+        var link = _sftpInfo.HttpPath;
+
+        if (!link.EndsWith('/'))
+        {
+            link += "/";
+        }
+            
+        return $"{link}{UploadFileInfo.Name}";
     }
 
     public Task<bool> UploadAsync(IProgress<double>? progress = null)
