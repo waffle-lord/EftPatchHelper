@@ -48,26 +48,26 @@ namespace EftPatchHelper.Tasks
                 AnsiConsole.WriteLine("Added MEGA");
             }
 
+            if (_settings.SftpUploads.Count > 0 && _options.UploadToSftpSites)
+            {
+              foreach (var sftpInfo in _settings.SftpUploads)
+              {
+                if (!sftpInfo.IsValid())
+                {
+                  continue;
+                }
+
+                AnsiConsole.WriteLine($"Added SFTP: {sftpInfo.Hostname}");
+                _fileUploads.Add(new SftpUpload(patcherFile, sftpInfo));
+              }
+            }
+
             if (_settings.UsingMega() && _options.UploadToMega)
             {
                 var mega = new MegaUpload(patcherFile, _settings.MegaEmail, _settings.MegaPassword);
                 await mega.SetUploadFolder(_settings.MegaUploadFolder);
                 _fileUploads.Add(mega);
                 AnsiConsole.WriteLine("Added MEGA");
-            }
-
-            if (_settings.SftpUploads.Count > 0 && _options.UploadToSftpSites)
-            {
-                foreach (var sftpInfo in _settings.SftpUploads)
-                {
-                    if (!sftpInfo.IsValid())
-                    {
-                        continue;
-                    }
-
-                    AnsiConsole.WriteLine($"Added SFTP: {sftpInfo.Hostname}");
-                    _fileUploads.Add(new SftpUpload(patcherFile, sftpInfo));
-                }
             }
 
             return true;
