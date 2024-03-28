@@ -19,7 +19,8 @@ public class ZipHelper
             {
                 CompressionLevel = CompressionLevel.Normal,
                 CompressionMethod = CompressionMethod.Lzma2,
-                ArchiveFormat = OutArchiveFormat.SevenZip
+                ArchiveFormat = OutArchiveFormat.SevenZip,
+                PreserveDirectoryRoot = true
             };
 
             compressor.Compressing += (_, args) => { progress.Report(args.PercentDone); };
