@@ -30,7 +30,7 @@ namespace EftPatchHelper.Model
             _folderId = folderId;
             UploadFileInfo = file;
             ServiceName = "GoFile";
-            DisplayName = $"{ServiceName} Upload: {UploadFileInfo.Name}";
+            DisplayName = $"{ServiceName} Upload";
             HubEntryText = $"Download from {ServiceName}";
             AddHubEntry = true;
         }

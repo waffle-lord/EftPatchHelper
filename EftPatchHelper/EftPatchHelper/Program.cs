@@ -20,6 +20,7 @@ namespace EftPatchHelper
         ITaskable _fileProcessingTasks;
         ITaskable _patchGenTasks;
         ITaskable _patchTestingTasks;
+        private ITaskable _compressPatcherTasks;
         ITaskable _createReleaseTasks;
         ITaskable _uploadTasks;
 
@@ -45,6 +46,7 @@ namespace EftPatchHelper
             IFileProcessingTasks fileProcessingTasks,
             IPatchGenTasks patchGenTasks,
             IPatchTestingTasks patchTestingTasks,
+            ICompressPatcherTasks compressPatcherTasks,
             IUploadTasks uploadTasks,
             IReleaseCreator createReleaseTasks
             )
@@ -55,6 +57,7 @@ namespace EftPatchHelper
             _fileProcessingTasks = fileProcessingTasks;
             _patchGenTasks = patchGenTasks;
             _patchTestingTasks = patchTestingTasks;
+            _compressPatcherTasks = compressPatcherTasks;
             _createReleaseTasks = createReleaseTasks;
             _uploadTasks = uploadTasks;
         }
@@ -67,6 +70,7 @@ namespace EftPatchHelper
             _fileProcessingTasks.Run();
             _patchGenTasks.Run();
             _patchTestingTasks.Run();
+            _compressPatcherTasks.Run();
             _uploadTasks.Run();
             _createReleaseTasks.Run();
         }
@@ -84,6 +88,9 @@ namespace EftPatchHelper
                     return settings;
                 });
 
+                services.AddSingleton<FileHelper>();
+                services.AddSingleton<ZipHelper>();
+
                 services.AddScoped<EftClientSelector>();
 
                 services.AddTransient<ISettingsTask, StartupSettingsTask>();
@@ -92,6 +99,7 @@ namespace EftPatchHelper
                 services.AddTransient<IFileProcessingTasks, FileProcessingTasks>();
                 services.AddTransient<IPatchGenTasks, PatchGenTasks>();
                 services.AddTransient<IPatchTestingTasks, PatchTestingTasks>();
+                services.AddTransient<ICompressPatcherTasks, CompressPatcherTasks>();
                 services.AddTransient<IReleaseCreator, CreateReleaseTasks>();
                 services.AddTransient<IUploadTasks, UploadTasks>();
                 services.AddTransient<Program>();

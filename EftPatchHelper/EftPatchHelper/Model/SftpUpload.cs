@@ -30,7 +30,7 @@ public class SftpUpload : IFileUpload
         };
         
         ServiceName = _sftpInfo.Hostname;
-        DisplayName = $"{ServiceName} Upload: {UploadFileInfo.Name}";
+        DisplayName = $"{ServiceName} Upload";
         HubEntryText = $"Download from {ServiceName}";
         AddHubEntry = false;
     }

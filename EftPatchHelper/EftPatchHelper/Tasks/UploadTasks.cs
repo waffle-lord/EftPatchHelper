@@ -45,7 +45,7 @@ namespace EftPatchHelper.Tasks
             {
                 var gofile = new GoFileUpload(patcherFile, _settings.GoFileApiKey, _settings.GoFileFolderId);
                 _fileUploads.Add(gofile);
-                AnsiConsole.WriteLine("Added MEGA");
+                AnsiConsole.WriteLine("Added GoFile");
             }
 
             if (_settings.SftpUploads.Count > 0 && _options.UploadToSftpSites)
@@ -134,6 +134,8 @@ namespace EftPatchHelper.Tasks
             {
                 return false;
             }
+            
+            AnsiConsole.MarkupLine($"[blue]Starting {_fileUploads[0].UploadFileInfo.Name} uploads ...[/]");
 
             var succeeded = await AnsiConsole.Progress().Columns(
                 new TaskDescriptionColumn() { Alignment = Justify.Left},
