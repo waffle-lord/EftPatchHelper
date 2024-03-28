@@ -92,6 +92,7 @@ namespace EftPatchHelper
                 services.AddTransient<IFileProcessingTasks, FileProcessingTasks>();
                 services.AddTransient<IPatchGenTasks, PatchGenTasks>();
                 services.AddTransient<IPatchTestingTasks, PatchTestingTasks>();
+                services.AddTransient<ICompressPatcherTask, CompressPatcherTask>();
                 services.AddTransient<IReleaseCreator, CreateReleaseTasks>();
                 services.AddTransient<IUploadTasks, UploadTasks>();
                 services.AddTransient<Program>();

@@ -5,8 +5,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>1.5.6</AssemblyVersion>
-    <FileVersion>1.5.6</FileVersion>
+    <AssemblyVersion>1.5.7</AssemblyVersion>
+    <FileVersion>1.5.7</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +19,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Spectre.Console" Version="0.44.0" />
+    <PackageReference Include="Squid-Box.SevenZipSharp" Version="1.6.1.23" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +35,11 @@
     <None Update="settings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\7z.dll" />
+    <EmbeddedResource Include="Resources\7z.dll" />
   </ItemGroup>
 
 </Project>
