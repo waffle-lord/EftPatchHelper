@@ -6,13 +6,13 @@ using Spectre.Console;
 
 namespace EftPatchHelper.Tasks;
 
-public class CompressPatcherTask : ICompressPatcherTask
+public class CompressPatcherTasks : ICompressPatcherTasks
 {
     private Options _options;
     private FileHelper _fileHelper;
     private ZipHelper _zipHelper;
     
-    public CompressPatcherTask(Options options, FileHelper fileHelper, ZipHelper zipHelper)
+    public CompressPatcherTasks(Options options, FileHelper fileHelper, ZipHelper zipHelper)
     {
         _options = options;
         _fileHelper = fileHelper;
@@ -21,7 +21,7 @@ public class CompressPatcherTask : ICompressPatcherTask
 
     public bool CompressPatcher()
     {
-        AnsiConsole.Progress()
+        return AnsiConsole.Progress()
             .Columns(new ProgressColumn[]
             {
                 new TaskDescriptionColumn(),
@@ -32,6 +32,7 @@ public class CompressPatcherTask : ICompressPatcherTask
             })
             .Start(ctx =>
             {
+
                 var compressionTask = ctx.AddTask("Compressing Patcher");
                 compressionTask.MaxValue = 100;
                 
@@ -41,20 +42,18 @@ public class CompressPatcherTask : ICompressPatcherTask
                 }
 
                 var patchFolder = new DirectoryInfo(_options.OutputPatchPath);
+                
+                var patchArchiveFile = new FileInfo(_options.OutputPatchPath + ".7z");
 
                 if (!patchFolder.Exists)
                 {
                     return false;
                 }
 
-                var patchArchiveFile = new FileInfo(_options.OutputPatchPath + ".7z");
-
                 var progress = new Progress<double>(p => { compressionTask.Increment(p - compressionTask.Percentage);});
 
                 return _zipHelper.Compress(patchFolder, patchArchiveFile, progress);
             });
-
-        return false;
     }
 
     public void Run()

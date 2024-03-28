@@ -48,6 +48,7 @@ namespace EftPatchHelper.Tasks
                         $"OutputFolderName::{patcherOutputName}",
                         $"SourceFolderPath::{_options.SourceClient.PrepPath}",
                         $"TargetFolderPath::{_options.TargetClient.PrepPath}",
+                        $"AutoZip::false",
                         $"AutoClose::{_settings.AutoClose}"
                     }
                 });

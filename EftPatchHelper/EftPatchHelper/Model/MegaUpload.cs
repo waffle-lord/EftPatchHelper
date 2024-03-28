@@ -27,7 +27,7 @@ namespace EftPatchHelper.Model
             _email = email;
             _password = password;
             ServiceName = "Mega";
-            DisplayName = $"{ServiceName} Upload: {UploadFileInfo.Name}";
+            DisplayName = $"{ServiceName} Upload";
             HubEntryText = $"Download from {ServiceName}";
             AddHubEntry = true;
         }
