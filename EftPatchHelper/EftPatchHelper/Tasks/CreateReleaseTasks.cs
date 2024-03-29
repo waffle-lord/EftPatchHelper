@@ -64,9 +64,11 @@ namespace EftPatchHelper.Tasks
 
             string releaseName = $"{sourceTail} to {targetTail}";
 
+            string tag = $"{sourceTail}_{new Random().Next(100, 999)}";
+
             try
             {
-                var release = repo.RepoCreateRelease(_settings.GiteaReleaseRepoOwner, _settings.GiteaReleaseRepoName, new CreateReleaseOption(null, false, releaseName, false, sourceTail, null)); 
+                var release = repo.RepoCreateRelease(_settings.GiteaReleaseRepoOwner, _settings.GiteaReleaseRepoName, new CreateReleaseOption(null, false, releaseName, false, tag, null)); 
 
                 AnsiConsole.MarkupLine($"[green]Release added: {release.Name.EscapeMarkup()}[/]");
 
