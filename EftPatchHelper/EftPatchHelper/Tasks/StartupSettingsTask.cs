@@ -81,6 +81,11 @@ namespace EftPatchHelper.Tasks
                 _options.UploadToGoFile = new ConfirmationPrompt("Upload to GoFile?").Show(AnsiConsole.Console);
             }
 
+            if (_settings.UsingR2())
+            {
+                _options.UplaodToR2 = new ConfirmationPrompt("Upload to R2?").Show(AnsiConsole.Console);
+            }
+
             if (_settings.SftpUploads.Count > 0)
             {
                 _options.UploadToSftpSites =

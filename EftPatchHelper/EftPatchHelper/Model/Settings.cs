@@ -57,6 +57,21 @@ namespace EftPatchHelper.Model
         [JsonPropertyName("goFileFolderId")]
         public string GoFileFolderId { get; set; } = "";
 
+        [JsonPropertyName("r2ConnectedDomainUrl")]
+        public string R2ConnectedDomainUrl { get; set; } = "";
+
+        [JsonPropertyName("r2ServiceUrl")]
+        public string R2ServiceUrl { get; set; } = "";
+
+        [JsonPropertyName("r2Bucketname")]
+        public string R2BucketName { get; set; } = "";
+        
+        [JsonPropertyName("r2AccessKeyId")]
+        public string R2AccessKeyId { get; set; } = "";
+        
+        [JsonPropertyName("r2SecretKeyId")]
+        public string R2SecretKeyId { get; set; } = "";
+
         [JsonPropertyName("sftpUploads")]
         public List<SftpUploadInfo> SftpUploads { get; set; } = new();
 
@@ -110,6 +125,17 @@ namespace EftPatchHelper.Model
             if (string.IsNullOrWhiteSpace(GoFileApiKey)) return false;
 
             if(string.IsNullOrWhiteSpace(GoFileFolderId)) return false;
+
+            return true;
+        }
+
+        public bool UsingR2()
+        {
+            if (string.IsNullOrWhiteSpace(R2ConnectedDomainUrl)) return false;
+            if (string.IsNullOrWhiteSpace(R2ServiceUrl)) return false;
+            if (string.IsNullOrWhiteSpace(R2BucketName)) return false;
+            if (string.IsNullOrWhiteSpace(R2AccessKeyId)) return false;
+            if (string.IsNullOrWhiteSpace(R2SecretKeyId)) return false;
 
             return true;
         }

@@ -39,6 +39,8 @@ namespace EftPatchHelper.Model
         /// </summary>
         public bool UploadToMega = false;
 
+        public bool UplaodToR2 = false;
+
         /// <summary>
         /// Whether or not to upload to all sftp site listing
         /// </summary>

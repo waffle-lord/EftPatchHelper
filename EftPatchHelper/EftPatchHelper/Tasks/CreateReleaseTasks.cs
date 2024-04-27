@@ -20,39 +20,49 @@ namespace EftPatchHelper.Tasks
             _options = options;
         }
 
-        private bool UploadAsset(FileInfo file, Release release, RepositoryApi repo)
+        private bool UploadMirrorList(FileInfo file)
         {
-            return AnsiConsole.Status().Spinner(Spinner.Known.Point).Start("Uploading Asset", (StatusContext context) =>
-            {
-                AnsiConsole.MarkupLine($"[blue]Adding release asset: {file.Name.EscapeMarkup()}[/]");
+            var r2Uplaod = new R2Upload(_settings.R2ConnectedDomainUrl, _settings.R2ServiceUrl, _settings.R2AccessKeyId,
+                _settings.R2SecretKeyId, _settings.R2BucketName);
+            
+            
 
-                file.Refresh();
-
-                if (!file.Exists)
-                {
-                    AnsiConsole.MarkupLine($"[red]File does not exist: {file.FullName}[/]");
-                }
-
-                using var fileStream = file.OpenRead();
-
-                try
-                {
-                    var attachment = repo.RepoCreateReleaseAttachment(_settings.GiteaReleaseRepoOwner, _settings.GiteaReleaseRepoName, release.Id, fileStream, file.Name);
-
-                    AnsiConsole.MarkupLine("[green]Upload Complete[/]");
-
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    AnsiConsole.MarkupLine("[red]Failed to upload asset[/]");
-
-                    AnsiConsole.WriteException(ex);
-
-                    return false;
-                }
-            });
+            return true;
         }
+
+        // private bool UploadAsset(FileInfo file, Release release, RepositoryApi repo)
+        // {
+        //     return AnsiConsole.Status().Spinner(Spinner.Known.Point).Start("Uploading Asset", (StatusContext context) =>
+        //     {
+        //         AnsiConsole.MarkupLine($"[blue]Adding release asset: {file.Name.EscapeMarkup()}[/]");
+        //
+        //         file.Refresh();
+        //
+        //         if (!file.Exists)
+        //         {
+        //             AnsiConsole.MarkupLine($"[red]File does not exist: {file.FullName}[/]");
+        //         }
+        //
+        //         using var fileStream = file.OpenRead();
+        //
+        //         try
+        //         {
+        //             var attachment = repo.RepoCreateReleaseAttachment(_settings.GiteaReleaseRepoOwner, _settings.GiteaReleaseRepoName, release.Id, fileStream, file.Name);
+        //
+        //             AnsiConsole.MarkupLine("[green]Upload Complete[/]");
+        //
+        //             return true;
+        //         }
+        //         catch (Exception ex)
+        //         {
+        //             AnsiConsole.MarkupLine("[red]Failed to upload asset[/]");
+        //
+        //             AnsiConsole.WriteException(ex);
+        //
+        //             return false;
+        //         }
+        //     });
+        // }
 
         private Release? MakeRelease(RepositoryApi repo)
         {
@@ -111,7 +121,7 @@ namespace EftPatchHelper.Tasks
 
             var release = MakeRelease(repo).ValidateOrExit<Release>();
 
-            UploadAsset(fileInfo, release, repo);
+            //UploadAsset(fileInfo, release, repo);
         }
     }
 }

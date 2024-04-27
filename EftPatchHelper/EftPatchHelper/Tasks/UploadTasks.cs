@@ -48,6 +48,14 @@ namespace EftPatchHelper.Tasks
                 AnsiConsole.WriteLine("Added GoFile");
             }
 
+            if (_settings.UsingR2() && _options.UplaodToR2)
+            {
+                var r2 = new R2Upload(_settings.R2ConnectedDomainUrl, _settings.R2ServiceUrl, _settings.R2AccessKeyId,
+                    _settings.R2SecretKeyId, _settings.R2BucketName);
+                _fileUploads.Add(r2);
+                AnsiConsole.WriteLine($"Added R2: {_settings.R2BucketName}");
+            }
+
             if (_settings.SftpUploads.Count > 0 && _options.UploadToSftpSites)
             {
               foreach (var sftpInfo in _settings.SftpUploads)
