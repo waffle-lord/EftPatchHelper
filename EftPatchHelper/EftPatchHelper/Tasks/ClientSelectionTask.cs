@@ -1,8 +1,8 @@
-﻿using EftPatchHelper.Extensions;
+﻿using System.Net.Http.Json;
+using EftPatchHelper.Extensions;
 using EftPatchHelper.Helpers;
 using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
-using Gitea.Api;
 using Spectre.Console;
 
 namespace EftPatchHelper.Tasks
@@ -12,11 +12,13 @@ namespace EftPatchHelper.Tasks
         private Settings _settings;
         private Options _options;
         private EftClientSelector _clientSelector;
+        private HttpClient _http;
 
-        public ClientSelectionTask(Settings settings, Options options, EftClientSelector clientSelector)
+        public ClientSelectionTask(Settings settings, Options options, EftClientSelector clientSelector, HttpClient client)
         {
             _settings = settings;
             _options = options;
+            _http = client;
             _clientSelector = clientSelector;
         }
 
@@ -58,22 +60,16 @@ namespace EftPatchHelper.Tasks
 
         private string GetCurrentReleaseVersion()
         {
-            if (!_settings.UsingGitea())
-                return "";
-
-            return AnsiConsole.Status().Start("Starting...", ctx => 
+            return AnsiConsole.Status().Start("Starting...", async ctx =>
             {
-                RepositoryApi repo = new RepositoryApi();
-
                 ctx.Spinner = Spinner.Known.Dots8;
                 ctx.Status = "Getting latest release ...";
+                
+                var blah = await _http.GetAsync(_settings.LatestReleaseUrl);
+                var release = await blah.Content.ReadFromJsonAsync<ReleaseInfo>();
 
-                var releases = repo.RepoListReleases("SPT-AKI", "Stable-releases");
-
-                var release = releases.First(x => !x.Prerelease).Name.Split('(')[1];
-
-                return release.Remove(release.Length - 1);
-            });
+                return release?.ClientVersion ?? "failed to get version :(";
+            }).GetAwaiter().GetResult();
         }
 
         public void Run()

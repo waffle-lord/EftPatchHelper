@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Amazon.Runtime;
 using Amazon.S3;
+using Amazon.S3.Model;
 using EftPatchHelper.Model;
 using Spectre.Console;
 
@@ -8,21 +9,21 @@ namespace EftPatchHelper.Helpers;
 
 public class R2Helper
 {
-    private readonly IAmazonS3? _client;
-    public bool IsReady => _client != null;
-
-    private Settings _settings;
+    private readonly AmazonS3Client? _client;
+    public string ConnectedDomain { get; private set; }
+    public string BucketName { get; private set; }
 
     public R2Helper(Settings settings, Options options)
     {
-        _settings = settings;
+        ConnectedDomain = settings.R2ConnectedDomainUrl;
+        BucketName = settings.R2BucketName;
 
-        if (_settings.UsingR2() && options.UplaodToR2)
+        if (settings.UsingR2())
         {
-            var creds = new BasicAWSCredentials(_settings.R2AccessKeyId, _settings.R2SecretKeyId);
+            var creds = new BasicAWSCredentials(settings.R2AccessKeyId, settings.R2SecretKeyId);
             _client = new AmazonS3Client(creds, new AmazonS3Config
             {
-                ServiceURL = _settings.R2ServiceUrl,
+                ServiceURL = settings.R2ServiceUrl,
             });
         }
     }
@@ -30,37 +31,86 @@ public class R2Helper
     /// <summary>
     /// Deletes all content in the bucket
     /// </summary>
-    /// <returns></returns>
+    /// <returns>True if all contents of the bucket were deleted, otherwise false</returns>
     public async Task<bool> ClearBucketAsync()
     {
-        AnsiConsole.MarkupLine($"[blue]Getting bucket contents: {_settings.R2BucketName}[/]");
-        var listBucketReponse = await _client.ListObjectsAsync(_settings.R2BucketName);
+        if (_client == null)
+        {
+            AnsiConsole.MarkupLine("[red]Client is unavailable[/]");
+            return false;
+        }
+        
+        AnsiConsole.MarkupLine($"[blue]Getting bucket contents: {BucketName}[/]");
+        var listBucketResponse = await _client.ListObjectsAsync(BucketName);
 
-        if (listBucketReponse.HttpStatusCode != HttpStatusCode.OK)
+        if (listBucketResponse.HttpStatusCode != HttpStatusCode.OK)
         {
             AnsiConsole.MarkupLine("[red]failed to get bucket contents[/]");
             return false;
         }
         
-        AnsiConsole.MarkupLine("[blue]Removing old content");
-        foreach (var s3Object in listBucketReponse.S3Objects)
+        AnsiConsole.MarkupLine("[blue]Removing old content[/]");
+        foreach (var s3Object in listBucketResponse.S3Objects)
         {
-            var deleteRepsonse = await _client.DeleteObjectAsync(_settings.R2BucketName, s3Object.Key);
+            var deleteResponse = await _client.DeleteObjectAsync(BucketName, s3Object.Key);
 
-            if (deleteRepsonse.HttpStatusCode != HttpStatusCode.OK)
+            if (deleteResponse.HttpStatusCode != HttpStatusCode.OK)
             {
-                AnsiConsole.MarkupLine($"[red]failed to delete {_settings.R2BucketName}::{s3Object.Key}[/]");
+                AnsiConsole.MarkupLine($"[red]failed to delete {BucketName}::{s3Object.Key}[/]");
                 return false;
             }
             
-            AnsiConsole.MarkupLine($"[green]{_settings.R2BucketName}::{s3Object.Key} removed[/]");
+            AnsiConsole.MarkupLine($"[green]{BucketName}::{s3Object.Key} removed[/]");
         }
 
         return true;
     }
 
-    public async Task<bool> UplaodToBucketAsync(FileInfo file, IProgress<double> progress = null)
+    /// <summary>
+    /// Upload a file into the bucket
+    /// </summary>
+    /// <param name="file">The file to upload</param>
+    /// <param name="progress">A progress object to track upload progress</param>
+    /// <returns>True if the file was uploaded successfully, otherwise false</returns>
+    public async Task<bool> UploadToBucketAsync(FileInfo file, IProgress<double>? progress = null)
     {
-        // todo: this
+        if (_client == null)
+        {
+            AnsiConsole.MarkupLine("[red]Client is unavailable[/]");
+            return false;
+        }
+
+        file.Refresh();
+
+        if (!file.Exists)
+        {
+            AnsiConsole.MarkupLine($"[red]File '{file.Name}' does not exist[/]");
+            return false;
+        }
+        
+        var request = new PutObjectRequest
+        {
+            BucketName = BucketName,
+            FilePath = file.FullName,
+            DisablePayloadSigning = true,
+        };
+
+        if (progress != null)
+        {
+            request.StreamTransferProgress = (sender, progressArgs) =>
+            {
+                progress.Report(progressArgs.PercentDone);
+            };
+        }
+        
+        var uploadResponse = await _client.PutObjectAsync(request);
+
+        if (uploadResponse.HttpStatusCode != HttpStatusCode.OK)
+        {
+            AnsiConsole.MarkupLine("[red]failed to upload file[/]");
+            return false;
+        }
+
+        return true;
     }
 }

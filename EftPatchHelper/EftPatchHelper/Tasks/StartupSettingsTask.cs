@@ -1,7 +1,6 @@
 ﻿using EftPatchHelper.Extensions;
 using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
-using Gitea.Client;
 using Spectre.Console;
 
 namespace EftPatchHelper.Tasks
@@ -62,14 +61,6 @@ namespace EftPatchHelper.Tasks
         private void ConfirmOptions()
         {
             _options.IgnoreExistingDirectories = new ConfirmationPrompt("Skip existing directories? (you will be prompted if no)").Show(AnsiConsole.Console);
-
-            if (_settings.UsingGitea())
-            {
-                Configuration.Default.BasePath = _settings.GiteaApiBasePath;
-                Configuration.Default.AddApiKey("token", _settings.GiteaApiKey);
-
-                _options.CreateRelease = new ConfirmationPrompt("Create a release on gitea?").Show(AnsiConsole.Console);
-            }
 
             if (_settings.UsingMega())
             {

@@ -30,17 +30,8 @@ namespace EftPatchHelper.Model
         [JsonPropertyName("patcherExePath")]
         public string PatcherEXEPath { get; set; } = "";
 
-        [JsonPropertyName("giteaApiBasePath")]
-        public string GiteaApiBasePath { get; set; } = "";
-
-        [JsonPropertyName("giteaApiKey")]
-        public string GiteaApiKey { get; set; } = "";
-
-        [JsonPropertyName("giteaReleaseRepoOwner")]
-        public string GiteaReleaseRepoOwner { get; set; } = "";
-
-        [JsonPropertyName("giteaReleaseRepoName")]
-        public string GiteaReleaseRepoName { get; set; } = "";
+        [JsonPropertyName("latestReleaseUrl")]
+        public string LatestReleaseUrl { get; set; } = "";
 
         [JsonPropertyName("megaEmail")]
         public string MegaEmail { get; set; } = "";
@@ -63,7 +54,7 @@ namespace EftPatchHelper.Model
         [JsonPropertyName("r2ServiceUrl")]
         public string R2ServiceUrl { get; set; } = "";
 
-        [JsonPropertyName("r2Bucketname")]
+        [JsonPropertyName("r2BucketName")]
         public string R2BucketName { get; set; } = "";
         
         [JsonPropertyName("r2AccessKeyId")]
@@ -96,19 +87,6 @@ namespace EftPatchHelper.Model
                 AnsiConsole.WriteException(ex);
                 return false;
             }
-        }
-
-        public bool UsingGitea()
-        {
-            if (string.IsNullOrWhiteSpace(GiteaApiBasePath)) return false;
-
-            if (string.IsNullOrWhiteSpace(GiteaReleaseRepoOwner)) return false;
-
-            if (string.IsNullOrWhiteSpace(GiteaReleaseRepoName)) return false;
-
-            if (string.IsNullOrWhiteSpace(GiteaApiKey)) return false;
-
-            return true;
         }
 
         public bool UsingMega()

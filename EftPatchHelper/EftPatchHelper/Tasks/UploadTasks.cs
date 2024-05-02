@@ -3,20 +3,23 @@ using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
 using Spectre.Console;
 using System.Security.Cryptography;
+using EftPatchHelper.Helpers;
 
 namespace EftPatchHelper.Tasks
 {
     public class UploadTasks : IUploadTasks
     {
-        private Options _options;
-        private Settings _settings;
-        private List<IFileUpload> _fileUploads = new List<IFileUpload>();
-        private Dictionary<IFileUpload, ProgressTask> uploadTasks = new Dictionary<IFileUpload, ProgressTask>();
+        private readonly Options _options;
+        private readonly Settings _settings;
+        private readonly R2Helper _r2;
+        private readonly List<IFileUpload> _fileUploads = new();
+        private readonly Dictionary<IFileUpload, ProgressTask> _uploadTasks = new();
 
-        public UploadTasks(Options options, Settings settings)
+        public UploadTasks(Options options, Settings settings, R2Helper r2)
         {
             _options = options;
             _settings = settings;
+            _r2 = r2;
         }
 
         private static string GetFileHash(FileInfo file)
@@ -50,10 +53,14 @@ namespace EftPatchHelper.Tasks
 
             if (_settings.UsingR2() && _options.UplaodToR2)
             {
-                var r2 = new R2Upload(_settings.R2ConnectedDomainUrl, _settings.R2ServiceUrl, _settings.R2AccessKeyId,
-                    _settings.R2SecretKeyId, _settings.R2BucketName);
+                if (!await _r2.ClearBucketAsync())
+                {
+                    return false;
+                }
+                
+                var r2 = new R2Upload(patcherFile, _r2);
                 _fileUploads.Add(r2);
-                AnsiConsole.WriteLine($"Added R2: {_settings.R2BucketName}");
+                AnsiConsole.WriteLine($"Added R2::{_r2.BucketName}");
             }
 
             if (_settings.SftpUploads.Count > 0 && _options.UploadToSftpSites)
@@ -157,10 +164,10 @@ namespace EftPatchHelper.Tasks
                     {
                         var task = context.AddTask($"[purple][[Pending]][/] {file.DisplayName} - [blue]{BytesToString(file.UploadFileInfo.Length)}[/]");
                         task.IsIndeterminate = true;
-                        uploadTasks.Add(file, task);
+                        _uploadTasks.Add(file, task);
                     }
 
-                    foreach(var pair in uploadTasks)
+                    foreach(var pair in _uploadTasks)
                     {
                         // set the value of the progress task object
                         var progress = new System.Progress<double>((d) => pair.Value.Value = d);
@@ -193,7 +200,7 @@ namespace EftPatchHelper.Tasks
 
         public void Run()
         {
-            if (!_options.UploadToGoFile && !_options.UploadToMega && !_options.UploadToSftpSites) return;
+            if (!_options.UploadToGoFile && !_options.UploadToMega && !_options.UploadToSftpSites && !_options.UplaodToR2) return;
 
             UploadAllFiles().GetAwaiter().GetResult().ValidateOrExit();
 

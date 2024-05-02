@@ -25,20 +25,18 @@ namespace EftPatchHelper.Model
         public string OutputPatchPath = null;
 
         /// <summary>
-        /// Whether or not the user opted to create a release on gitea
-        /// </summary>
-        public bool CreateRelease = false;
-
-        /// <summary>
         /// Whether or not to upload the patcher to gofile.io
         /// </summary>
         public bool UploadToGoFile = false;
 
         /// <summary>
-        /// Whether or not to upload the pather to mega.io
+        /// Whether or not to upload the patcher to mega.io
         /// </summary>
         public bool UploadToMega = false;
 
+        /// <summary>
+        /// Whether or not to upload the patcher and mirror list to r2
+        /// </summary>
         public bool UplaodToR2 = false;
 
         /// <summary>
