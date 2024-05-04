@@ -8,11 +8,13 @@ namespace EftPatchHelper.Tasks
 {
     public class UploadMirrorListTasks : IMirrorUploader
     {
+        private Settings _settings;
         private Options _options;
         private R2Helper _r2;
 
-        public UploadMirrorListTasks(Options options, R2Helper r2)
+        public UploadMirrorListTasks(Settings settigns, Options options, R2Helper r2)
         {
+            _settings = settigns;
             _options = options;
             _r2 = r2;
         }
@@ -52,6 +54,11 @@ namespace EftPatchHelper.Tasks
 
         public void Run()
         {
+            if (!_settings.UsingR2() || !_options.UplaodToR2)
+            {
+                return;
+            }
+            
             AnsiConsole.WriteLine();
 
             var fileInfo = new FileInfo(Path.Join(Environment.CurrentDirectory, "mirrors.json"));
