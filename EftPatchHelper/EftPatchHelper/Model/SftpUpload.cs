@@ -32,7 +32,7 @@ public class SftpUpload : IFileUpload
         ServiceName = _sftpInfo.Hostname;
         DisplayName = $"{ServiceName} Upload";
         HubEntryText = $"Download from {ServiceName}";
-        AddHubEntry = false;
+        AddHubEntry = sftpInfo.AllowHubEntry;
     }
     
     public string GetLink()

@@ -25,6 +25,9 @@ public class SftpUploadInfo
     [JsonPropertyName("httpPath")]
     public string HttpPath { get; set; } = "";
 
+    [JsonPropertyName("allowHubEntry")]
+    public bool AllowHubEntry { get; set; } = false;
+
     public bool IsValid()
     {
         if (string.IsNullOrWhiteSpace(Username))

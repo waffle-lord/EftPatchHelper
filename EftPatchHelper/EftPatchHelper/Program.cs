@@ -20,9 +20,9 @@ namespace EftPatchHelper
         ITaskable _fileProcessingTasks;
         ITaskable _patchGenTasks;
         ITaskable _patchTestingTasks;
-        private ITaskable _compressPatcherTasks;
-        ITaskable _createReleaseTasks;
+        ITaskable _compressPatcherTasks;
         ITaskable _uploadTasks;
+        ITaskable _uploadMirrorList;
 
         public static void Main(string[] args)
         {
@@ -48,7 +48,7 @@ namespace EftPatchHelper
             IPatchTestingTasks patchTestingTasks,
             ICompressPatcherTasks compressPatcherTasks,
             IUploadTasks uploadTasks,
-            IReleaseCreator createReleaseTasks
+            IMirrorUploader uploadMirrorList
             )
         {
             _settingsTasks = settingsTasks;
@@ -58,7 +58,7 @@ namespace EftPatchHelper
             _patchGenTasks = patchGenTasks;
             _patchTestingTasks = patchTestingTasks;
             _compressPatcherTasks = compressPatcherTasks;
-            _createReleaseTasks = createReleaseTasks;
+            _uploadMirrorList = uploadMirrorList;
             _uploadTasks = uploadTasks;
         }
 
@@ -72,14 +72,17 @@ namespace EftPatchHelper
             _patchTestingTasks.Run();
             _compressPatcherTasks.Run();
             _uploadTasks.Run();
-            _createReleaseTasks.Run();
+            _uploadMirrorList.Run();
         }
 
         private static IHost ConfigureHost(string[] args)
         {
             return Host.CreateDefaultBuilder(args).ConfigureServices((_, services) =>
             {
+                HttpClient client = new HttpClient() { Timeout = TimeSpan.FromHours(1) };
+                
                 services.AddSingleton<Options>();
+                services.AddSingleton(client);
                 services.AddSingleton<Settings>(serviceProvider =>
                 {
                     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
@@ -90,6 +93,7 @@ namespace EftPatchHelper
 
                 services.AddSingleton<FileHelper>();
                 services.AddSingleton<ZipHelper>();
+                services.AddSingleton<R2Helper>();
 
                 services.AddScoped<EftClientSelector>();
 
@@ -100,8 +104,8 @@ namespace EftPatchHelper
                 services.AddTransient<IPatchGenTasks, PatchGenTasks>();
                 services.AddTransient<IPatchTestingTasks, PatchTestingTasks>();
                 services.AddTransient<ICompressPatcherTasks, CompressPatcherTasks>();
-                services.AddTransient<IReleaseCreator, CreateReleaseTasks>();
                 services.AddTransient<IUploadTasks, UploadTasks>();
+                services.AddTransient<IMirrorUploader, UploadMirrorListTasks>();
                 services.AddTransient<Program>();
             })
             .ConfigureAppConfiguration((_, config) =>

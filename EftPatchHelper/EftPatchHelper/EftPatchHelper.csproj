@@ -5,11 +5,12 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>1.5.10</AssemblyVersion>
-    <FileVersion>1.5.10</FileVersion>
+    <AssemblyVersion>1.6.0</AssemblyVersion>
+    <FileVersion>1.6.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" Version="3.7.307.24" />
     <PackageReference Include="FubarCoder.RestSharp.Portable.Core" Version="4.0.8" />
     <PackageReference Include="FubarCoder.RestSharp.Portable.HttpClient" Version="4.0.8" />
     <PackageReference Include="GoFileSharp" Version="1.0.2" />
@@ -23,9 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Gitea">
-      <HintPath>Resources\Gitea.dll</HintPath>
-    </Reference>
     <Reference Include="WinSCPnet">
       <HintPath>Resources\WinSCPnet.dll</HintPath>
     </Reference>

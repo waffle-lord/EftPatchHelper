@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EftPatchHelper.Interfaces
 {
-    public interface IReleaseCreator : ITaskable
+    public interface IMirrorUploader : ITaskable
     {
     }
 }

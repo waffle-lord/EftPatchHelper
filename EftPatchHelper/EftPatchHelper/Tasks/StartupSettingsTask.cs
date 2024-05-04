@@ -1,7 +1,6 @@
 ﻿using EftPatchHelper.Extensions;
 using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
-using Gitea.Client;
 using Spectre.Console;
 
 namespace EftPatchHelper.Tasks
@@ -63,14 +62,6 @@ namespace EftPatchHelper.Tasks
         {
             _options.IgnoreExistingDirectories = new ConfirmationPrompt("Skip existing directories? (you will be prompted if no)").Show(AnsiConsole.Console);
 
-            if (_settings.UsingGitea())
-            {
-                Configuration.Default.BasePath = _settings.GiteaApiBasePath;
-                Configuration.Default.AddApiKey("token", _settings.GiteaApiKey);
-
-                _options.CreateRelease = new ConfirmationPrompt("Create a release on gitea?").Show(AnsiConsole.Console);
-            }
-
             if (_settings.UsingMega())
             {
                 _options.UploadToMega = new ConfirmationPrompt("Upload to Mega?").Show(AnsiConsole.Console);
@@ -79,6 +70,11 @@ namespace EftPatchHelper.Tasks
             if (_settings.UsingGoFile())
             {
                 _options.UploadToGoFile = new ConfirmationPrompt("Upload to GoFile?").Show(AnsiConsole.Console);
+            }
+
+            if (_settings.UsingR2())
+            {
+                _options.UplaodToR2 = new ConfirmationPrompt("Upload to R2?").Show(AnsiConsole.Console);
             }
 
             if (_settings.SftpUploads.Count > 0)
