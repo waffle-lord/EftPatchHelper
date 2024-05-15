@@ -25,7 +25,8 @@
       "hostname": "sftp.slugma-ligma.com",
       "port": 12345,
       "uploadPath": "/public/patchers",
-      "httpPath": "https://mirror.slugma-ligma.com/patchers"
+      "httpPath": "https://mirror.slugma-ligma.com/patchers",
+      "allowHubEntry": true
     }
   ]
 }
