@@ -74,7 +74,7 @@ namespace EftPatchHelper.Tasks
 
             if (_settings.UsingR2())
             {
-                _options.UplaodToR2 = new ConfirmationPrompt("Upload to R2?").Show(AnsiConsole.Console);
+                _options.UplaodToR2 = new ConfirmationPrompt($"Upload to R2 ({_settings.R2BucketName})?").Show(AnsiConsole.Console);
             }
 
             if (_settings.SftpUploads.Count > 0)

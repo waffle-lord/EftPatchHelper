@@ -32,8 +32,15 @@ namespace EftPatchHelper
             var version = Assembly.GetExecutingAssembly().GetName().Version;
             AnsiConsole.Write(new Rule($"[purple]v{version}[/]").Centered().RuleStyle("blue"));
 
-            var host = ConfigureHost(args);
-            host.Services.GetRequiredService<Program>().Run();
+            try
+            {
+                var host = ConfigureHost(args);
+                host.Services.GetRequiredService<Program>().Run();
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.MarkupLine($"[red]{ex.Message.EscapeMarkup()}[/]");
+            }
 
             AnsiConsole.MarkupLine("Press [blue]Enter[/] to close ...");
             Console.ReadLine();

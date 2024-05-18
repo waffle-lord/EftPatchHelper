@@ -48,13 +48,19 @@ public class R2Helper
             AnsiConsole.MarkupLine("[red]failed to get bucket contents[/]");
             return false;
         }
+
+        if (listBucketResponse.S3Objects.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[green]bucket is empty[/]");
+            return true;
+        }
         
         AnsiConsole.MarkupLine("[blue]Removing old content[/]");
         foreach (var s3Object in listBucketResponse.S3Objects)
         {
             var deleteResponse = await _client.DeleteObjectAsync(BucketName, s3Object.Key);
 
-            if (deleteResponse.HttpStatusCode != HttpStatusCode.OK)
+            if ((int)deleteResponse.HttpStatusCode < 200 || (int)deleteResponse.HttpStatusCode > 299)
             {
                 AnsiConsole.MarkupLine($"[red]failed to delete {BucketName}::{s3Object.Key}[/]");
                 return false;

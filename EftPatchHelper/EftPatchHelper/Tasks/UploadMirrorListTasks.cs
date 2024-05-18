@@ -41,10 +41,12 @@ namespace EftPatchHelper.Tasks
 
         public bool CreateMirrorList(FileInfo mirrorListFileInfo)
         {
+            var sourcePatchVersion = _options.SourceClient.Version.Split('.').Last();
+            var targetPatchVersion = _options.TargetClient.Version.Split('.').Last();
             var mirrorInfo = new PatchInfo
             {
-                SourceClientVersion = int.Parse(_options.SourceClient.Version),
-                TargetClientVersion = int.Parse(_options.TargetClient.Version),
+                SourceClientVersion = int.Parse(sourcePatchVersion),
+                TargetClientVersion = int.Parse(targetPatchVersion),
                 Mirrors = _options.MirrorList.Values.ToList() 
             };
 
