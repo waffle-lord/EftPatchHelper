@@ -41,9 +41,14 @@ namespace EftPatchHelper.Tasks
 
         public bool CreateMirrorList(FileInfo mirrorListFileInfo)
         {
-            List<DownloadMirror> mirrors = _options.MirrorList.Values.ToList();
+            var mirrorInfo = new PatchInfo
+            {
+                SourceClientVersion = int.Parse(_options.SourceClient.Version),
+                TargetClientVersion = int.Parse(_options.TargetClient.Version),
+                Mirrors = _options.MirrorList.Values.ToList() 
+            };
 
-            string json = JsonSerializer.Serialize(mirrors, new JsonSerializerOptions() { WriteIndented = true });
+            string json = JsonSerializer.Serialize(mirrorInfo, new JsonSerializerOptions() { WriteIndented = true });
 
             File.WriteAllText(mirrorListFileInfo.FullName, json);
 
