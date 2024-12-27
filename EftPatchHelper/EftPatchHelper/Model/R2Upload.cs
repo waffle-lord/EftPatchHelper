@@ -17,7 +17,7 @@ public class R2Upload : IFileUpload
     {
         _r2 = r2;
         UploadFileInfo = file;
-        ServiceName = $"R2::{_r2.BucketName} Upload";
+        ServiceName = $"R2::{_r2.BucketName}";
         DisplayName = $"{ServiceName} Upload";
         HubEntryText = $"Download from {ServiceName}";
         AddHubEntry = false;

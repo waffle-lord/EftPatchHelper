@@ -1,10 +1,21 @@
 ﻿using System.Reflection;
 using Spectre.Console;
+using System.Security.Cryptography;
 
 namespace EftPatchHelper.Helpers;
 
 public class FileHelper
 {
+    public string GetFileHash(FileInfo file)
+    {
+        using (MD5 md5Service = MD5.Create())
+        using (var sourceStream = file.OpenRead())
+        {
+            byte[] sourceHash = md5Service.ComputeHash(sourceStream);
+
+            return Convert.ToBase64String(sourceHash);
+        }
+    }
     public bool StreamAssemblyResourceOut(string resourceName, string outputFilePath)
     {
         try

@@ -1,4 +1,5 @@
-﻿using EftPatchHelper.Extensions;
+﻿using System.Collections;
+using EftPatchHelper.Extensions;
 using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
 using Spectre.Console;
@@ -83,12 +84,38 @@ namespace EftPatchHelper.Tasks
                     new ConfirmationPrompt($"Upload to SFTP sites? ( {_settings.SftpUploads.Count} sites )").Show(AnsiConsole.Console);
             }
         }
+        
+        private void CheckPromptUploadOnly()
+        {
+            var patcher = new FileInfo(_settings?.PatcherEXEPath ?? "");
+
+            if (!patcher.Exists)
+            {
+                return;
+            }
+
+            var patcherFile = patcher.Directory?.GetFiles("*.7z", SearchOption.TopDirectoryOnly).First();
+
+            if (patcherFile == null)
+            {
+                return;
+            }
+            
+            _options.UploadOnly = new ConfirmationPrompt($"{patcherFile.Name} was found. Upload now?").Show(AnsiConsole.Console);
+
+            if (_options.UploadOnly)
+            {
+                _options.OutputPatchPath = patcherFile.FullName.Replace(".7z", "");
+            }
+        }
 
         public void Run()
         {
             ValidateSettings().ValidateOrExit();
 
             ConfirmOptions();
+            
+            CheckPromptUploadOnly();
 
             PrintSummary();
         }

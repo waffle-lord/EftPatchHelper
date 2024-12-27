@@ -2,7 +2,6 @@
 using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
 using Spectre.Console;
-using System.Security.Cryptography;
 using EftPatchHelper.Helpers;
 
 namespace EftPatchHelper.Tasks
@@ -11,6 +10,7 @@ namespace EftPatchHelper.Tasks
     {
         private readonly Options _options;
         private readonly Settings _settings;
+        private readonly FileHelper _fileHelper;
         private readonly R2Helper _r2;
         private readonly List<IFileUpload> _fileUploads = new();
         private readonly Dictionary<IFileUpload, ProgressTask> _uploadTasks = new();
@@ -20,17 +20,6 @@ namespace EftPatchHelper.Tasks
             _options = options;
             _settings = settings;
             _r2 = r2;
-        }
-
-        private static string GetFileHash(FileInfo file)
-        {
-            using (MD5 md5Service = MD5.Create())
-            using (var sourceStream = file.OpenRead())
-            {
-                byte[] sourceHash = md5Service.ComputeHash(sourceStream);
-
-                return Convert.ToBase64String(sourceHash);
-            }
         }
 
         private async Task<bool> BuildUploadList()
@@ -185,7 +174,7 @@ namespace EftPatchHelper.Tasks
                             {
                                 AddHubEntry = pair.Key.AddHubEntry,
                                 Link = pair.Key.GetLink(),
-                                Hash = GetFileHash(pair.Key.UploadFileInfo)
+                                Hash = _fileHelper.GetFileHash(pair.Key.UploadFileInfo)
                             };
 
                             _options.MirrorList.Add(pair.Key.HubEntryText, mirror);

@@ -45,6 +45,11 @@ namespace EftPatchHelper.Model
         public bool UploadToSftpSites = false;
 
         /// <summary>
+        /// Whether or not to only upload an existing patcher file
+        /// </summary>
+        public bool UploadOnly = false;
+
+        /// <summary>
         /// List of mirrors to upload to Gitea
         /// </summary>
         public Dictionary<string, DownloadMirror> MirrorList = new Dictionary<string, DownloadMirror>();

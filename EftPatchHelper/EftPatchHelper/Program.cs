@@ -23,6 +23,7 @@ namespace EftPatchHelper
         ITaskable _compressPatcherTasks;
         ITaskable _uploadTasks;
         ITaskable _uploadMirrorList;
+        Options _options;
 
         public static void Main(string[] args)
         {
@@ -55,7 +56,8 @@ namespace EftPatchHelper
             IPatchTestingTasks patchTestingTasks,
             ICompressPatcherTasks compressPatcherTasks,
             IUploadTasks uploadTasks,
-            IMirrorUploader uploadMirrorList
+            IMirrorUploader uploadMirrorList,
+            Options options
             )
         {
             _settingsTasks = settingsTasks;
@@ -67,17 +69,23 @@ namespace EftPatchHelper
             _compressPatcherTasks = compressPatcherTasks;
             _uploadMirrorList = uploadMirrorList;
             _uploadTasks = uploadTasks;
+            _options = options;
         }
 
         public void Run()
         {
             _settingsTasks.Run();
-            _clientSelectionTasks.Run();
-            _cleanupTasks.Run();
-            _fileProcessingTasks.Run();
-            _patchGenTasks.Run();
-            _patchTestingTasks.Run();
-            _compressPatcherTasks.Run();
+
+            if (!_options.UploadOnly)
+            {
+                _clientSelectionTasks.Run();
+                _cleanupTasks.Run();
+                _fileProcessingTasks.Run();
+                _patchGenTasks.Run();
+                _patchTestingTasks.Run();
+                _compressPatcherTasks.Run();
+            }
+
             _uploadTasks.Run();
             _uploadMirrorList.Run();
         }
