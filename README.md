@@ -10,4 +10,4 @@ Figured I'd share  :)
 
 ## Requirements
 - .net 8
-- PatchGenerator.exe (https://dev.sp-tarkov.com/waffle.lord/Patcher/releases)
+- PatchGenerator.exe (https://github.com/sp-tarkov/patcher)
