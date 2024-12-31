@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using EftPatchHelper.EftInfo;
 using EftPatchHelper.Extensions;
 using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
@@ -59,63 +60,9 @@ namespace EftPatchHelper.Tasks
             return true;
         }
 
-        private void ConfirmOptions()
-        {
-            _options.IgnoreExistingDirectories = new ConfirmationPrompt("Skip existing directories? (you will be prompted if no)").Show(AnsiConsole.Console);
-
-            if (_settings.UsingMega())
-            {
-                _options.UploadToMega = new ConfirmationPrompt("Upload to Mega?").Show(AnsiConsole.Console);
-            }
-
-            if (_settings.UsingGoFile())
-            {
-                _options.UploadToGoFile = new ConfirmationPrompt("Upload to GoFile?").Show(AnsiConsole.Console);
-            }
-
-            if (_settings.UsingR2())
-            {
-                _options.UplaodToR2 = new ConfirmationPrompt($"Upload to R2 ({_settings.R2BucketName})?").Show(AnsiConsole.Console);
-            }
-
-            if (_settings.SftpUploads.Count > 0)
-            {
-                _options.UploadToSftpSites =
-                    new ConfirmationPrompt($"Upload to SFTP sites? ( {_settings.SftpUploads.Count} sites )").Show(AnsiConsole.Console);
-            }
-        }
-        
-        private void CheckPromptUploadOnly()
-        {
-            var patcher = new FileInfo(_settings?.PatcherEXEPath ?? "");
-
-            if (!patcher.Exists)
-            {
-                return;
-            }
-
-            var patcherFile = patcher.Directory?.GetFiles("*.7z", SearchOption.TopDirectoryOnly).First();
-
-            if (patcherFile == null)
-            {
-                return;
-            }
-            
-            _options.UploadOnly = new ConfirmationPrompt($"{patcherFile.Name} was found. Upload now?").Show(AnsiConsole.Console);
-
-            if (_options.UploadOnly)
-            {
-                _options.OutputPatchPath = patcherFile.FullName.Replace(".7z", "");
-            }
-        }
-
         public void Run()
         {
             ValidateSettings().ValidateOrExit();
-
-            ConfirmOptions();
-            
-            CheckPromptUploadOnly();
 
             PrintSummary();
         }

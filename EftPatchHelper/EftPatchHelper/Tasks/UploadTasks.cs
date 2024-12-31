@@ -15,11 +15,12 @@ namespace EftPatchHelper.Tasks
         private readonly List<IFileUpload> _fileUploads = new();
         private readonly Dictionary<IFileUpload, ProgressTask> _uploadTasks = new();
 
-        public UploadTasks(Options options, Settings settings, R2Helper r2)
+        public UploadTasks(Options options, Settings settings, R2Helper r2, FileHelper fileHelper)
         {
             _options = options;
             _settings = settings;
             _r2 = r2;
+            _fileHelper = fileHelper;
         }
 
         private async Task<bool> BuildUploadList()
@@ -117,21 +118,6 @@ namespace EftPatchHelper.Tasks
             }
         }
 
-        static string BytesToString(long byteCount)
-        {
-            string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
-            
-            if (byteCount == 0)
-            {
-                return "0" + suf[0];
-            }
-            
-            long bytes = Math.Abs(byteCount);
-            int place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
-            double num = Math.Round(bytes / Math.Pow(1024, place), 1);
-            return (Math.Sign(byteCount) * num).ToString() + suf[place];
-        }
-
         private async Task<bool> UploadAllFiles()
         {
             if(!await BuildUploadList())
@@ -151,7 +137,7 @@ namespace EftPatchHelper.Tasks
                 {
                     foreach(var file in _fileUploads)
                     {
-                        var task = context.AddTask($"[purple][[Pending]][/] {file.DisplayName} - [blue]{BytesToString(file.UploadFileInfo.Length)}[/]");
+                        var task = context.AddTask($"[purple][[Pending]][/] {file.DisplayName} - [blue]{file.UploadFileInfo.HumanLength()}[/]");
                         task.IsIndeterminate = true;
                         _uploadTasks.Add(file, task);
                     }
@@ -162,7 +148,7 @@ namespace EftPatchHelper.Tasks
                         var progress = new System.Progress<double>((d) => pair.Value.Value = d);
 
                         pair.Value.IsIndeterminate = false;
-                        pair.Value.Description = $"{pair.Key.DisplayName} - [blue]{BytesToString(pair.Key.UploadFileInfo.Length)}[/]";
+                        pair.Value.Description = $"{pair.Key.DisplayName} - [blue]{pair.Key.UploadFileInfo.HumanLength()}[/]";
 
                         if(!await pair.Key.UploadAsync(progress))
                         {
@@ -170,7 +156,7 @@ namespace EftPatchHelper.Tasks
                         }
                         else
                         {
-                            DownloadMirror mirror = new DownloadMirror
+                            var mirror = new DownloadMirror
                             {
                                 AddHubEntry = pair.Key.AddHubEntry,
                                 Link = pair.Key.GetLink(),
