@@ -40,6 +40,11 @@ namespace EftPatchHelper.Model
         public bool UplaodToR2 = false;
 
         /// <summary>
+        /// Whether or not to send updates to the pizza-oven status page for patching
+        /// </summary>
+        public bool UpdatePizzaStatus = false;
+
+        /// <summary>
         /// Whether or not to upload to all sftp site listing
         /// </summary>
         public bool UploadToSftpSites = false;

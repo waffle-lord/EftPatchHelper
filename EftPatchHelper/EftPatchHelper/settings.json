@@ -17,6 +17,7 @@
   "r2BucketName": "",
   "r2AccessKeyId": "",
   "r2SecretKeyId": "",
+  "pizzaApiKey": "",
   "sftpUploads": [
     {
       "username": "example-remove-before-using",
