@@ -17,9 +17,17 @@ namespace EftPatchHelper
     public enum RunOption
     {
         MirrorTemplate,
+        PizzaOvenApi,
         FileHash,
         UploadOnly,
         GeneratePatches,
+    }
+
+    public enum PizzaApiOption
+    {
+        GetCurrent,
+        NewOrder,
+        UpdateCurrent,
     }
     
     public class Program
@@ -33,6 +41,7 @@ namespace EftPatchHelper
         ITaskable _compressPatcherTasks;
         ITaskable _uploadTasks;
         ITaskable _uploadMirrorList;
+        PizzaHelper _pizzaHelper;
         FileHelper _fileHelper;
         Settings _settings;
         Options _options;
@@ -94,6 +103,7 @@ namespace EftPatchHelper
             ICompressPatcherTasks compressPatcherTasks,
             IUploadTasks uploadTasks,
             IMirrorUploader uploadMirrorList,
+            PizzaHelper pizzaHelper,
             FileHelper fileHelper,
             Settings settings,
             Options options
@@ -108,6 +118,7 @@ namespace EftPatchHelper
             _compressPatcherTasks = compressPatcherTasks;
             _uploadMirrorList = uploadMirrorList;
             _uploadTasks = uploadTasks;
+            _pizzaHelper = pizzaHelper;
             _fileHelper = fileHelper;
             _settings = settings;
             _options = options;
@@ -154,6 +165,11 @@ namespace EftPatchHelper
         private void ConfirmOptions()
         {
             _options.IgnoreExistingDirectories = new ConfirmationPrompt("Skip existing directories? (you will be prompted if no)").Show(AnsiConsole.Console);
+
+            if (_settings.UsingPizzaOven())
+            {
+                _options.UpdatePizzaStatus = new ConfirmationPrompt("Update pizza-oven status page?").Show(AnsiConsole.Console);
+            }
 
             if (_settings.UsingMega())
             {
@@ -230,6 +246,57 @@ namespace EftPatchHelper
             return true;
         }
 
+        private void ProcessPizzaApiDirect()
+        {
+            if (!_settings.UsingPizzaOven())
+            {
+                return;
+            }
+                    
+            var apiOptionsSelection = new SelectionPrompt<PizzaApiOption>()
+                .Title("Select an option to run")
+                .AddChoices(Enum.GetValues<PizzaApiOption>())
+                .UseConverter(x =>
+                {
+                    return x switch
+                    {
+                        PizzaApiOption.GetCurrent => "Get current order",
+                        PizzaApiOption.UpdateCurrent => "Update current order",
+                        PizzaApiOption.NewOrder => "Create new order",
+                        _ => "--error--"
+                    };
+                });
+            
+            var answer = AnsiConsole.Prompt(apiOptionsSelection);
+
+            switch (answer)
+            {
+                case PizzaApiOption.GetCurrent:
+                    var currentOrder = _pizzaHelper.GetCurrentOrder();
+
+                    if (currentOrder is null)
+                    {
+                        AnsiConsole.MarkupLine("[red]No open order found[/]");
+                        return;
+                    }
+                    
+                    AnsiConsole.MarkupLine("=== Current Open Order ===");
+                    AnsiConsole.MarkupLine($"Order #  : [blue]{currentOrder.OrderNumber}[/]");
+                    AnsiConsole.MarkupLine($"Message  : [blue]{currentOrder.Message.EscapeMarkup()}[/]");
+                    AnsiConsole.MarkupLine($"Progress : [blue]{currentOrder.Progress}[/]");
+                    break;
+                case PizzaApiOption.NewOrder:
+                    var newOrder = NewPizzaOrder.PromptCreate();
+                    _pizzaHelper.PostNewOrder(newOrder);
+                    break;
+                case PizzaApiOption.UpdateCurrent:
+                    _pizzaHelper.UpdateOrder();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
         public void Run()
         {
             _settingsTasks.Run();
@@ -246,6 +313,7 @@ namespace EftPatchHelper
                     return x switch
                     {
                         RunOption.MirrorTemplate => "Create mirror.json template",
+                        RunOption.PizzaOvenApi => "Pizza Oven API",
                         RunOption.FileHash => $"Get file hash: {fileName}",
                         RunOption.UploadOnly => $"Upload Existing File: {fileName}",
                         RunOption.GeneratePatches => "Generate patches",
@@ -264,6 +332,9 @@ namespace EftPatchHelper
             {
                 case RunOption.MirrorTemplate:
                     CreateExampleMirrorsFile();
+                    break;
+                case RunOption.PizzaOvenApi:
+                    ProcessPizzaApiDirect();
                     break;
                 case RunOption.FileHash:
                     ComputeFileHash(existingPatchFile);
@@ -296,7 +367,7 @@ namespace EftPatchHelper
         {
             return Host.CreateDefaultBuilder(args).ConfigureServices((_, services) =>
             {
-                HttpClient client = new HttpClient() { Timeout = TimeSpan.FromHours(1) };
+                var client = new HttpClient() { Timeout = TimeSpan.FromHours(1) };
                 
                 services.AddSingleton<Options>();
                 services.AddSingleton(client);
@@ -311,9 +382,10 @@ namespace EftPatchHelper
                 services.AddSingleton<FileHelper>();
                 services.AddSingleton<ZipHelper>();
                 services.AddSingleton<R2Helper>();
+                services.AddSingleton<PizzaHelper>();
 
                 services.AddScoped<EftClientSelector>();
-
+                
                 services.AddTransient<ISettingsTask, StartupSettingsTask>();
                 services.AddTransient<ICleanupTask, CleanupTask>();
                 services.AddTransient<IClientSelectionTask, ClientSelectionTask>();

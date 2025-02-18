@@ -18,6 +18,7 @@
   "r2AccessKeyId": "",
   "r2SecretKeyId": "",
   "pizzaApiKey": "",
+  "pizzaApiUrl": "",
   "sftpUploads": [
     {
       "username": "example-remove-before-using",
