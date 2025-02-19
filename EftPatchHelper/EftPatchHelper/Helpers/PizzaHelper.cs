@@ -5,51 +5,43 @@ namespace EftPatchHelper.Helpers;
 
 public class PizzaHelper
 {
-    private string _apiKey = "";
-    private string _apiUrl = "";
-    private HttpClient _client;
+    private readonly string _apiKey = "";
+    private readonly string _apiUrl = "";
+    private readonly HttpClient _client;
     
     public PizzaHelper(Settings settings, HttpClient httpClient)
     {
         _client = httpClient;
-        
-        if (settings.UsingPizzaOven())
+
+        if (!settings.UsingPizzaOven())
         {
-            _apiKey = settings.PizzaApiKey;
-            _apiUrl = settings.PizzaApiUrl;
+            return;
         }
+        
+        _apiKey = settings.PizzaApiKey;
+        _apiUrl = settings.PizzaApiUrl;
     }
 
-    private HttpResponseMessage SendApiRequest(HttpMethod method, string url, string json = "")
+    public PizzaOrder? PostNewOrder(PizzaOrderData orderData)
     {
-        var request = new HttpRequestMessage(method, url);
+        var json = JsonSerializer.Serialize(orderData);
         
-        request.Headers.Add("Authorization", $"Bearer {_apiKey}");
-        request.Headers.Add("Accept", "application/json");
+        var request = PizzaRouteRequest.NewOrder(_apiKey, _apiUrl, json).GetRequest();
+        
+        var response = _client.Send(request);
 
-        if (!string.IsNullOrWhiteSpace(json))
-        {
-            request.Headers.Add("Content-Type", "application/json");
-            request.Content = new StringContent(json);
-        }
+        json = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
-        var response = _client.SendAsync(request).GetAwaiter().GetResult();
+        var order = JsonSerializer.Deserialize<DataResponse<PizzaOrder>>(json);
 
-        return response;
-    }
-
-    public bool PostNewOrder(NewPizzaOrder order)
-    {
-        var json = JsonSerializer.Serialize(order);
-        var response = SendApiRequest(HttpMethod.Post, $"{_apiUrl}/api/v1/orders", json);
-
-        return response.IsSuccessStatusCode;
+        return order?.Data ?? null;
     }
 
     public PizzaOrder? GetCurrentOrder()
     {
-        var response = SendApiRequest(HttpMethod.Get, $"{_apiUrl}/api/v1/orders/current");
+        var request = PizzaRouteRequest.GetCurrentOrder(_apiKey, _apiUrl).GetRequest();
 
+        var response = _client.Send(request);
         var json = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
         var order = JsonSerializer.Deserialize<DataResponse<PizzaOrder>>(json);
@@ -57,8 +49,23 @@ public class PizzaHelper
         return order?.Data ?? null;
     }
 
-    public bool UpdateOrder()
+    public bool UpdateOrder(int id, int orderNumber, string message, int progress)
     {
-        throw new NotImplementedException();
+        return UpdateOrder(id, new PizzaOrderData()
+        {
+            OrderNumber = orderNumber,
+            Message = message,
+            Progress = progress
+        });
+    }
+
+    public bool UpdateOrder(int id, PizzaOrderData orderData)
+    {
+        var json = JsonSerializer.Serialize(orderData);
+        var request = PizzaRouteRequest.UpdateOrder(_apiKey, _apiUrl, id, json).GetRequest();
+        
+        var response = _client.Send(request);
+        
+        return response.IsSuccessStatusCode;
     }
 }

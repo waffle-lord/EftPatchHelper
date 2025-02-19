@@ -26,7 +26,7 @@ namespace EftPatchHelper.Helpers
                 eftVersion = eftVersion.Remove(0, 2);
             }
 
-            string[] fixedVersion = eftVersion.Split('.')[0..4];
+            string[] fixedVersion = eftVersion.Split('.')[..4];
 
             return string.Join('.', fixedVersion);
         }

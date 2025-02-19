@@ -286,15 +286,47 @@ namespace EftPatchHelper
                     AnsiConsole.MarkupLine($"Progress : [blue]{currentOrder.Progress}[/]");
                     break;
                 case PizzaApiOption.NewOrder:
-                    var newOrder = NewPizzaOrder.PromptCreate();
+                    var newOrder = PizzaOrderData.PromptCreate();
                     _pizzaHelper.PostNewOrder(newOrder);
                     break;
                 case PizzaApiOption.UpdateCurrent:
-                    _pizzaHelper.UpdateOrder();
+                    currentOrder = _pizzaHelper.GetCurrentOrder();
+                    
+                    if (currentOrder == null)
+                    {
+                        AnsiConsole.WriteLine("[purple]No current order to update[/]");
+                        return;
+                    }
+                    
+                    AnsiConsole.MarkupLine("=== Current Open Order ===");
+                    AnsiConsole.MarkupLine($"Order #  : [blue]{currentOrder.OrderNumber}[/]");
+                    AnsiConsole.MarkupLine($"Message  : [blue]{currentOrder.Message.EscapeMarkup()}[/]");
+                    AnsiConsole.MarkupLine($"Progress : [blue]{currentOrder.Progress}[/]");
+                    AnsiConsole.Write(new Rule());
+                    
+                    var updatedOrder = PizzaOrderData.PromptUpdate(currentOrder);
+
+                    if (_pizzaHelper.UpdateOrder(currentOrder.Id, updatedOrder))
+                    {
+                        AnsiConsole.MarkupLine("[green]Order updated[/]");
+                        return;
+                    }
+                    
+                    AnsiConsole.MarkupLine("[red]Failed to update order[/]");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        private void UpdatePizzaOrder(PizzaOrder? order, string message, int progress)
+        {
+            if (!_settings.UsingPizzaOven() || !_options.UpdatePizzaStatus || order is null)
+            {
+                return;
+            }
+            
+            _pizzaHelper.UpdateOrder(order.Id, order.OrderNumber, message, progress);
         }
 
         public void Run()
@@ -340,14 +372,66 @@ namespace EftPatchHelper
                     ComputeFileHash(existingPatchFile);
                     break;
                 case RunOption.GeneratePatches:
+                    PizzaOrder? order = null;
+                    if (_settings.UsingPizzaOven() && _options.UpdatePizzaStatus)
+                    {
+                        var currentOrder = _pizzaHelper.GetCurrentOrder();
+
+                        if (currentOrder != null)
+                        {
+                            var closeCurrentOrder = new PizzaOrderData()
+                            {
+                                OrderNumber = currentOrder.OrderNumber,
+                                Message = "Closing for new order creation",
+                                Progress = 0
+                            };
+
+                            _pizzaHelper.UpdateOrder(currentOrder.Id, closeCurrentOrder);
+                        }
+                        
+                        if (!int.TryParse(_options.SourceClient.Version.Split('.').Last(), out var sourceVersion))
+                        {
+                            AnsiConsole.MarkupLine("[red]Failed to get source version. Please provide it manually[/]");
+                            sourceVersion = new TextPrompt<int>("Enter source version: ").Show(AnsiConsole.Console);
+
+                            if (sourceVersion < 1)
+                            {
+                                AnsiConsole.MarkupLine("[red]Invalid provided source version. Aborting.");
+                                return;
+                            }
+                        }
+
+                        var newOrder = new PizzaOrderData
+                        {
+                            OrderNumber = sourceVersion,
+                            Message = "New order received! Cleaning up the kitchen",
+                            Progress = 0
+                        };
+                    
+                        order = _pizzaHelper.PostNewOrder(newOrder);
+                    }
+                    
                     _clientSelectionTasks.Run();
+                    
                     _cleanupTasks.Run();
+                    
+                    UpdatePizzaOrder(order, "Preparing some delicious data", 14);
                     _fileProcessingTasks.Run();
+                    
+                    UpdatePizzaOrder(order, "Generating toppings", 28);
                     _patchGenTasks.Run();
+                    
+                    UpdatePizzaOrder(order, "Taste Testing the pizza (don't tell my boss)", 42);
                     _patchTestingTasks.Run();
+
+                    UpdatePizzaOrder(order, "Packing up your order", 56);
                     _compressPatcherTasks.Run();
+                    
+                    UpdatePizzaOrder(order, "Order is being delivered", 74);
                     _uploadTasks.Run();
                     _uploadMirrorList.Run();
+
+                    UpdatePizzaOrder(order, "Order Completed", 100);
                     break;
                 case RunOption.UploadOnly:
                     if (!SetupUploadOnly(existingPatchFile))
