@@ -391,7 +391,11 @@ namespace EftPatchHelper
                     ComputeFileHash(existingPatchFile);
                     break;
                 case RunOption.GeneratePatches:
+                    
+                    _clientSelectionTasks.Run();
+
                     PizzaOrder? order = null;
+                    
                     if (_settings.UsingPizzaOven() && _options.UpdatePizzaStatus)
                     {
                         var currentOrder = _pizzaHelper.GetCurrentOrder();
@@ -429,8 +433,6 @@ namespace EftPatchHelper
                     
                         order = _pizzaHelper.PostNewOrder(newOrder);
                     }
-                    
-                    _clientSelectionTasks.Run();
                     
                     _cleanupTasks.Run();
                     
