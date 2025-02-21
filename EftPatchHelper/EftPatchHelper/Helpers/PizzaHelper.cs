@@ -44,9 +44,15 @@ public class PizzaHelper
         var response = _client.Send(request);
         var json = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
-        var order = JsonSerializer.Deserialize<DataResponse<PizzaOrder>>(json);
-
-        return order?.Data ?? null;
+        try
+        {
+            var order = JsonSerializer.Deserialize<DataResponse<PizzaOrder>>(json);
+            return order?.Data ?? null;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public bool UpdateOrder(int id, int orderNumber, string message, int progress)

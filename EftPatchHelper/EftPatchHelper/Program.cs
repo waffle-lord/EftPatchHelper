@@ -28,6 +28,7 @@ namespace EftPatchHelper
         GetCurrent,
         NewOrder,
         UpdateCurrent,
+        Done,
     }
     
     public class Program
@@ -252,7 +253,7 @@ namespace EftPatchHelper
             {
                 return;
             }
-                    
+
             var apiOptionsSelection = new SelectionPrompt<PizzaApiOption>()
                 .Title("Select an option to run")
                 .AddChoices(Enum.GetValues<PizzaApiOption>())
@@ -263,60 +264,78 @@ namespace EftPatchHelper
                         PizzaApiOption.GetCurrent => "Get current order",
                         PizzaApiOption.UpdateCurrent => "Update current order",
                         PizzaApiOption.NewOrder => "Create new order",
+                        PizzaApiOption.Done => "Exit",
                         _ => "--error--"
                     };
                 });
-            
-            var answer = AnsiConsole.Prompt(apiOptionsSelection);
 
-            switch (answer)
+            PizzaApiOption answer;
+            do
             {
-                case PizzaApiOption.GetCurrent:
-                    var currentOrder = _pizzaHelper.GetCurrentOrder();
+                AnsiConsole.Clear();
+                answer = AnsiConsole.Prompt(apiOptionsSelection);
 
-                    if (currentOrder is null)
-                    {
-                        AnsiConsole.MarkupLine("[red]No open order found[/]");
-                        return;
-                    }
-                    
-                    AnsiConsole.MarkupLine("=== Current Open Order ===");
-                    AnsiConsole.MarkupLine($"Order #  : [blue]{currentOrder.OrderNumber}[/]");
-                    AnsiConsole.MarkupLine($"Message  : [blue]{currentOrder.Message.EscapeMarkup()}[/]");
-                    AnsiConsole.MarkupLine($"Progress : [blue]{currentOrder.Progress}[/]");
-                    break;
-                case PizzaApiOption.NewOrder:
-                    var newOrder = PizzaOrderData.PromptCreate();
-                    _pizzaHelper.PostNewOrder(newOrder);
-                    break;
-                case PizzaApiOption.UpdateCurrent:
-                    currentOrder = _pizzaHelper.GetCurrentOrder();
-                    
-                    if (currentOrder == null)
-                    {
-                        AnsiConsole.WriteLine("[purple]No current order to update[/]");
-                        return;
-                    }
-                    
-                    AnsiConsole.MarkupLine("=== Current Open Order ===");
-                    AnsiConsole.MarkupLine($"Order #  : [blue]{currentOrder.OrderNumber}[/]");
-                    AnsiConsole.MarkupLine($"Message  : [blue]{currentOrder.Message.EscapeMarkup()}[/]");
-                    AnsiConsole.MarkupLine($"Progress : [blue]{currentOrder.Progress}[/]");
-                    AnsiConsole.Write(new Rule());
-                    
-                    var updatedOrder = PizzaOrderData.PromptUpdate(currentOrder);
+                switch (answer)
+                {
+                    case PizzaApiOption.GetCurrent:
+                        var currentOrder = _pizzaHelper.GetCurrentOrder();
 
-                    if (_pizzaHelper.UpdateOrder(currentOrder.Id, updatedOrder))
-                    {
-                        AnsiConsole.MarkupLine("[green]Order updated[/]");
-                        return;
-                    }
-                    
-                    AnsiConsole.MarkupLine("[red]Failed to update order[/]");
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                        if (currentOrder is null)
+                        {
+                            AnsiConsole.MarkupLine("[purple]No open order found[/]");
+                            break;
+                        }
+
+                        AnsiConsole.MarkupLine("=== Current Open Order ===");
+                        AnsiConsole.MarkupLine($"Order #  : [blue]{currentOrder.OrderNumber}[/]");
+                        AnsiConsole.MarkupLine($"Message  : [blue]{currentOrder.Message.EscapeMarkup()}[/]");
+                        AnsiConsole.MarkupLine($"Progress : [blue]{currentOrder.Progress}[/]");
+                        break;
+                    case PizzaApiOption.NewOrder:
+                        var newOrder = PizzaOrderData.PromptCreate();
+                        if (_pizzaHelper.PostNewOrder(newOrder) == null)
+                        {
+                            AnsiConsole.MarkupLine("[red]Failed to create new order[/]");
+                            break;
+                        }
+
+                        AnsiConsole.MarkupLine("[green]Order create[/]");
+                        break;
+                    case PizzaApiOption.UpdateCurrent:
+                        currentOrder = _pizzaHelper.GetCurrentOrder();
+
+                        if (currentOrder == null)
+                        {
+                            AnsiConsole.MarkupLine("[purple]No current order to update[/]");
+                            break;
+                        }
+
+                        AnsiConsole.MarkupLine("=== Current Open Order ===");
+                        AnsiConsole.MarkupLine($"Order #  : [blue]{currentOrder.OrderNumber}[/]");
+                        AnsiConsole.MarkupLine($"Message  : [blue]{currentOrder.Message.EscapeMarkup()}[/]");
+                        AnsiConsole.MarkupLine($"Progress : [blue]{currentOrder.Progress}[/]");
+                        AnsiConsole.Write(new Rule());
+
+                        var updatedOrder = PizzaOrderData.PromptUpdate(currentOrder);
+
+                        if (_pizzaHelper.UpdateOrder(currentOrder.Id, updatedOrder))
+                        {
+                            AnsiConsole.MarkupLine("[green]Order updated[/]");
+                            break;
+                        }
+
+                        AnsiConsole.MarkupLine("[red]Failed to update order[/]");
+                        break;
+                    case PizzaApiOption.Done:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                AnsiConsole.MarkupLine("Press [blue]Enter[/] to continue ...");
+                Console.ReadLine();
             }
+            while(answer != PizzaApiOption.Done);
         }
 
         private void UpdatePizzaOrder(PizzaOrder? order, string message, int progress)
@@ -383,7 +402,7 @@ namespace EftPatchHelper
                             {
                                 OrderNumber = currentOrder.OrderNumber,
                                 Message = "Closing for new order creation",
-                                Progress = 0
+                                Progress = 100
                             };
 
                             _pizzaHelper.UpdateOrder(currentOrder.Id, closeCurrentOrder);

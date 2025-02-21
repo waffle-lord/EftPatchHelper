@@ -24,7 +24,7 @@ public class PizzaOrderData
             throw new ApplicationException("Please enter a valid order number.");
         }
         
-        var message = new TextPrompt<string>("Enter message: ").DefaultValue("").Show(AnsiConsole.Console);
+        var message = new TextPrompt<string>("Enter message: ").DefaultValue("Order Received").Show(AnsiConsole.Console);
         var progress = new TextPrompt<int>("Enter progress: ").DefaultValue(0).Show(AnsiConsole.Console);
 
         return new PizzaOrderData()
