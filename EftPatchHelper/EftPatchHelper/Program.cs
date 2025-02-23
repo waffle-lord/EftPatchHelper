@@ -340,7 +340,7 @@ namespace EftPatchHelper
 
         public void Run()
         {
-            _settingsTasks.Run();
+            _settingsTasks.Run(null);
             
             var existingPatchFile = CheckExistingPatchFile();
 
@@ -368,6 +368,8 @@ namespace EftPatchHelper
             {
                 ConfirmOptions();
             }
+            
+            PizzaOrder? order = null;
 
             switch (answer)
             {
@@ -382,9 +384,8 @@ namespace EftPatchHelper
                     break;
                 case RunOption.GeneratePatches:
                     
-                    _clientSelectionTasks.Run();
+                    _clientSelectionTasks.Run(order);
 
-                    PizzaOrder? order = null;
                     
                     if (_settings.UsingPizzaOven() && _options.UpdatePizzaStatus)
                     {
@@ -392,9 +393,15 @@ namespace EftPatchHelper
 
                         if (currentOrder != null)
                         {
-                            var cancelOrder = PizzaOrderData.CancelOrder(currentOrder);
-
-                            _pizzaHelper.UpdateOrder(currentOrder.Id, cancelOrder);
+                            if (_pizzaHelper.CancelOrder(currentOrder.Id))
+                            {
+                                AnsiConsole.MarkupLine($"[green]Current Order (#{currentOrder.OrderNumber}) cancelled[/]");
+                            }
+                            else
+                            {
+                                AnsiConsole.MarkupLine("[red]Failed to cancel order[/]");
+                                return;
+                            }
                         }
                         
                         if (!int.TryParse(_options.SourceClient.Version.Split('.').Last(), out var sourceVersion))
@@ -409,30 +416,22 @@ namespace EftPatchHelper
                             }
                         }
 
-                        var newOrder = new PizzaOrderData
-                        {
-                            OrderNumber = sourceVersion,
-                            Message = "New order received! Cleaning up the kitchen",
-                            StepLabels = "Setup,Patching,Testing,Compress,Upload",
-                            CurrentStep = 0,
-                            StepProgress = 0
-                        };
+                        var newOrder = PizzaOrderData.NewBlankOrder(sourceVersion);
                     
                         order = _pizzaHelper.PostNewOrder(newOrder);
+
+                        AnsiConsole.MarkupLine(order != null
+                            ? $"[green]Order #{order.OrderNumber} created[/]"
+                            : "[red]Failed to create new order[/]");
                     }
                     
-                    _cleanupTasks.Run();
-                    
-                    _fileProcessingTasks.Run();
-                    
-                    _patchGenTasks.Run();
-                    
-                    _patchTestingTasks.Run();
-                    
-                    _compressPatcherTasks.Run();
-                    
-                    _uploadTasks.Run();
-                    _uploadMirrorList.Run();
+                    _cleanupTasks.Run(order);
+                    _fileProcessingTasks.Run(order);
+                    _patchGenTasks.Run(order);
+                    _patchTestingTasks.Run(order);
+                    _compressPatcherTasks.Run(order);
+                    _uploadTasks.Run(order);
+                    _uploadMirrorList.Run(order);
                     
                     break;
                 case RunOption.UploadOnly:
@@ -441,8 +440,10 @@ namespace EftPatchHelper
                         AnsiConsole.MarkupLine("[red]File not found[/]");
                         return;
                     }
-                    _uploadTasks.Run();
-                    _uploadMirrorList.Run();
+                    
+                    _uploadTasks.Run(order);
+                    _uploadMirrorList.Run(order);
+                    
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

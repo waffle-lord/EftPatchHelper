@@ -26,11 +26,19 @@ public class PizzaOrderData
     public static PizzaOrderData PromptCreate()
     {
         AnsiConsole.MarkupLine("=== [green] Creating new order[/] ===");
+        
         var orderNumber = new TextPrompt<int>("Enter order number: ").Show(AnsiConsole.Console);
 
         if (orderNumber <= 0)
         {
             throw new ApplicationException("Please enter a valid order number.");
+        }
+        
+        var useBlankOrder = new ConfirmationPrompt("Use blank order template?").Show(AnsiConsole.Console);
+
+        if (useBlankOrder)
+        {
+            return NewBlankOrder(orderNumber);
         }
         
         var message = new TextPrompt<string>("Enter message: ").DefaultValue("Order Received").Show(AnsiConsole.Console);
@@ -57,20 +65,21 @@ public class PizzaOrderData
 
         return new PizzaOrderData()
         {
-            OrderNumber = currentOrder.OrderNumber,
             Message = message,
             CurrentStep = currentStep,
             StepProgress = stepProgress,
         };
     }
 
-    public static PizzaOrderData CancelOrder(PizzaOrder currentOrder)
+    public static PizzaOrderData NewBlankOrder(int orderNumber)
     {
-        return new PizzaOrderData()
+        return new PizzaOrderData
         {
-            OrderNumber = currentOrder.OrderNumber,
-            Message = "Order cancelled",
-            Status = "Cancelled",
+            OrderNumber = orderNumber,
+            Message = "New order received! We're getting the kitchen ready!",
+            StepLabels = "Setup,Patch,Test,Pack,Upload",
+            CurrentStep = 0,
+            StepProgress = 0
         };
     }
 }

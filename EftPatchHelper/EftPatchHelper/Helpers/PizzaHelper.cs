@@ -55,21 +55,20 @@ public class PizzaHelper
         }
     }
 
-    public bool UpdateOrder(int id, int orderNumber, string message, int progress)
-    {
-        return UpdateOrder(id, new PizzaOrderData()
-        {
-            OrderNumber = orderNumber,
-            Message = message,
-            Progress = progress
-        });
-    }
-
     public bool UpdateOrder(int id, PizzaOrderData orderData)
     {
         var json = JsonSerializer.Serialize(orderData);
         var request = PizzaRouteRequest.UpdateOrder(_apiKey, _apiUrl, id, json).GetRequest();
         
+        var response = _client.Send(request);
+        
+        return response.IsSuccessStatusCode;
+    }
+
+    public bool CancelOrder(int id)
+    {
+        var request = PizzaRouteRequest.CancelOrder(_apiKey, _apiUrl, id).GetRequest();
+
         var response = _client.Send(request);
         
         return response.IsSuccessStatusCode;

@@ -53,6 +53,12 @@ public class PizzaRouteRequest
         return new PizzaRouteRequest(HttpMethod.Patch, apiKey, url, json);
     }
 
+    public static PizzaRouteRequest CancelOrder(string apiKey, string url, int id)
+    {
+        url = CombineUrl(url, $"orders/cancel/{id}");
+        return new PizzaRouteRequest(HttpMethod.Put, apiKey, url);
+    }
+
     public HttpRequestMessage GetRequest()
     {
         var request = new HttpRequestMessage(_httpMethod, _url);
