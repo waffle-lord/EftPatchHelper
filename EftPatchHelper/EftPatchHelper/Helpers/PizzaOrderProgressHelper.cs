@@ -36,9 +36,13 @@ public class PizzaOrderProgressHelper
 
                 var partOffset = 100 / _partCount;
 
-                var partProgress = (double)progress / 100 * ((double)partOffset / 100) * 100 + _currentPart * partOffset;
+                var partProgress = 
+                    (double)progress / 100 * ((double)partOffset / 100) * 100 + _currentPart * partOffset;
 
-                _pizzaHelper.UpdateOrder(order.Id, new UpdatePizzaOrderRequest($"{order.GetCurrentStepLabel()}: {_currentPart+1} of {_partCount} - {progress}% | {_message}", currentStep, (int)partProgress));
+                var message = 
+                    $"{order.GetCurrentStepLabel()}: {_currentPart + 1} of {_partCount} - {progress}% | {_message}";
+
+                _pizzaHelper.UpdateOrder(order.Id, new UpdatePizzaOrderRequest(message, currentStep, (int)partProgress));
             });
     }
 
