@@ -338,16 +338,6 @@ namespace EftPatchHelper
             while(answer != PizzaApiOption.Done);
         }
 
-        private void UpdatePizzaOrder(PizzaOrder? order, string message, int progress)
-        {
-            if (!_settings.UsingPizzaOven() || !_options.UpdatePizzaStatus || order is null)
-            {
-                return;
-            }
-            
-            _pizzaHelper.UpdateOrder(order.Id, order.OrderNumber, message, progress);
-        }
-
         public void Run()
         {
             _settingsTasks.Run();
@@ -402,14 +392,9 @@ namespace EftPatchHelper
 
                         if (currentOrder != null)
                         {
-                            var closeCurrentOrder = new PizzaOrderData()
-                            {
-                                OrderNumber = currentOrder.OrderNumber,
-                                Message = "Closing for new order creation",
-                                Progress = 100
-                            };
+                            var cancelOrder = PizzaOrderData.CancelOrder(currentOrder);
 
-                            _pizzaHelper.UpdateOrder(currentOrder.Id, closeCurrentOrder);
+                            _pizzaHelper.UpdateOrder(currentOrder.Id, cancelOrder);
                         }
                         
                         if (!int.TryParse(_options.SourceClient.Version.Split('.').Last(), out var sourceVersion))
@@ -428,7 +413,9 @@ namespace EftPatchHelper
                         {
                             OrderNumber = sourceVersion,
                             Message = "New order received! Cleaning up the kitchen",
-                            Progress = 0
+                            StepLabels = "Setup,Patching,Testing,Compress,Upload",
+                            CurrentStep = 0,
+                            StepProgress = 0
                         };
                     
                         order = _pizzaHelper.PostNewOrder(newOrder);
@@ -436,23 +423,17 @@ namespace EftPatchHelper
                     
                     _cleanupTasks.Run();
                     
-                    UpdatePizzaOrder(order, "Preparing some delicious data", 14);
                     _fileProcessingTasks.Run();
                     
-                    UpdatePizzaOrder(order, "Generating toppings", 28);
                     _patchGenTasks.Run();
                     
-                    UpdatePizzaOrder(order, "Taste Testing the pizza (don't tell my boss)", 42);
                     _patchTestingTasks.Run();
-
-                    UpdatePizzaOrder(order, "Packing up your order", 56);
+                    
                     _compressPatcherTasks.Run();
                     
-                    UpdatePizzaOrder(order, "Order is being delivered", 74);
                     _uploadTasks.Run();
                     _uploadMirrorList.Run();
-
-                    UpdatePizzaOrder(order, "Order Completed", 100);
+                    
                     break;
                 case RunOption.UploadOnly:
                     if (!SetupUploadOnly(existingPatchFile))
