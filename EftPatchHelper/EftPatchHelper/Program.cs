@@ -6,6 +6,7 @@ using EftPatchHelper.EftInfo;
 using EftPatchHelper.Helpers;
 using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
+using EftPatchHelper.Model.PizzaRequests;
 using EftPatchHelper.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -286,13 +287,10 @@ namespace EftPatchHelper
                             break;
                         }
 
-                        AnsiConsole.MarkupLine("=== Current Open Order ===");
-                        AnsiConsole.MarkupLine($"Order #  : [blue]{currentOrder.OrderNumber}[/]");
-                        AnsiConsole.MarkupLine($"Message  : [blue]{currentOrder.Message.EscapeMarkup()}[/]");
-                        AnsiConsole.MarkupLine($"Progress : [blue]{currentOrder.Progress}[/]");
+                        currentOrder.AnsiPrint();
                         break;
                     case PizzaApiOption.NewOrder:
-                        var newOrder = PizzaOrderData.PromptCreate();
+                        var newOrder = NewPizzaOrderRequest.PromptCreate();
                         if (_pizzaHelper.PostNewOrder(newOrder) == null)
                         {
                             AnsiConsole.MarkupLine("[red]Failed to create new order[/]");
@@ -310,13 +308,10 @@ namespace EftPatchHelper
                             break;
                         }
 
-                        AnsiConsole.MarkupLine("=== Current Open Order ===");
-                        AnsiConsole.MarkupLine($"Order #  : [blue]{currentOrder.OrderNumber}[/]");
-                        AnsiConsole.MarkupLine($"Message  : [blue]{currentOrder.Message.EscapeMarkup()}[/]");
-                        AnsiConsole.MarkupLine($"Progress : [blue]{currentOrder.Progress}[/]");
+                        currentOrder.AnsiPrint();
                         AnsiConsole.Write(new Rule());
 
-                        var updatedOrder = PizzaOrderData.PromptUpdate(currentOrder);
+                        var updatedOrder = UpdatePizzaOrderRequest.PromptUpdate(currentOrder);
 
                         if (_pizzaHelper.UpdateOrder(currentOrder.Id, updatedOrder))
                         {
@@ -416,7 +411,7 @@ namespace EftPatchHelper
                             }
                         }
 
-                        var newOrder = PizzaOrderData.NewBlankOrder(sourceVersion);
+                        var newOrder = NewPizzaOrderRequest.NewBlankOrder(sourceVersion);
                     
                         order = _pizzaHelper.PostNewOrder(newOrder);
 
@@ -427,11 +422,11 @@ namespace EftPatchHelper
                     
                     _cleanupTasks.Run(order);
                     _fileProcessingTasks.Run(order);
-                    _patchGenTasks.Run(order);
-                    _patchTestingTasks.Run(order);
-                    _compressPatcherTasks.Run(order);
-                    _uploadTasks.Run(order);
-                    _uploadMirrorList.Run(order);
+                    // _patchGenTasks.Run(order);
+                    // _patchTestingTasks.Run(order);
+                    // _compressPatcherTasks.Run(order);
+                    // _uploadTasks.Run(order);
+                    // _uploadMirrorList.Run(order);
                     
                     break;
                 case RunOption.UploadOnly:

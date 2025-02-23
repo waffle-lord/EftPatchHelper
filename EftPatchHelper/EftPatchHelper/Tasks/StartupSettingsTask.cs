@@ -60,7 +60,7 @@ namespace EftPatchHelper.Tasks
             return true;
         }
 
-        public void Run()
+        public void Run(PizzaOrder? oder = null)
         {
             ValidateSettings().ValidateOrExit();
 

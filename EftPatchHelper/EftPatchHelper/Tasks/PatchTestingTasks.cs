@@ -74,7 +74,7 @@ namespace EftPatchHelper.Tasks
             });
         }
 
-        public void Run()
+        public void Run(PizzaOrder? oder = null)
         {
             CopySourceToPrep().ValidateOrExit();
 

@@ -56,7 +56,7 @@ public class CompressPatcherTasks : ICompressPatcherTasks
             });
     }
 
-    public void Run()
+    public void Run(PizzaOrder? oder = null)
     {
         CompressPatcher().ValidateOrExit();
     }

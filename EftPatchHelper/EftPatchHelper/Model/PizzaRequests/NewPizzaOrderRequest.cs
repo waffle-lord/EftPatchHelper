@@ -1,9 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 using Spectre.Console;
 
-namespace EftPatchHelper.Model;
+namespace EftPatchHelper.Model.PizzaRequests;
 
-public class PizzaOrderData
+public class NewPizzaOrderRequest
 {
     [JsonPropertyName("order_number")]
     public int OrderNumber { get; set; }
@@ -22,8 +22,8 @@ public class PizzaOrderData
 
     [JsonPropertyName("step_labels")]
     public string StepLabels { get; set; } = "";
-
-    public static PizzaOrderData PromptCreate()
+    
+    public static NewPizzaOrderRequest PromptCreate()
     {
         AnsiConsole.MarkupLine("=== [green] Creating new order[/] ===");
         
@@ -46,7 +46,7 @@ public class PizzaOrderData
         var currentStep = new TextPrompt<int>("Enter current step: ").Show(AnsiConsole.Console);
         var stepProgress = new TextPrompt<int>("Enter progress: ").DefaultValue(0).Show(AnsiConsole.Console);
 
-        return new PizzaOrderData()
+        return new NewPizzaOrderRequest()
         {
             OrderNumber = orderNumber,
             Message = message,
@@ -55,25 +55,10 @@ public class PizzaOrderData
             CurrentStep = currentStep,
         };
     }
-
-    public static PizzaOrderData PromptUpdate(PizzaOrder currentOrder)
+    
+    public static NewPizzaOrderRequest NewBlankOrder(int orderNumber)
     {
-        AnsiConsole.MarkupLine($"=== [green] Update order[/] [purple]{currentOrder.OrderNumber}[/] ===");
-        var message = new TextPrompt<string>("Enter message: ").Show(AnsiConsole.Console);
-        var currentStep = new TextPrompt<int>("Enter current step: ").Show(AnsiConsole.Console);
-        var stepProgress = new TextPrompt<int>("Enter progress: ").Show(AnsiConsole.Console);
-
-        return new PizzaOrderData()
-        {
-            Message = message,
-            CurrentStep = currentStep,
-            StepProgress = stepProgress,
-        };
-    }
-
-    public static PizzaOrderData NewBlankOrder(int orderNumber)
-    {
-        return new PizzaOrderData
+        return new NewPizzaOrderRequest
         {
             OrderNumber = orderNumber,
             Message = "New order received! We're getting the kitchen ready!",

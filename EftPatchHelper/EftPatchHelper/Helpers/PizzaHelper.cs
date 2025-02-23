@@ -1,5 +1,6 @@
 using System.Text.Json;
 using EftPatchHelper.Model;
+using EftPatchHelper.Model.PizzaRequests;
 
 namespace EftPatchHelper.Helpers;
 
@@ -22,7 +23,7 @@ public class PizzaHelper
         _apiUrl = settings.PizzaApiUrl;
     }
 
-    public PizzaOrder? PostNewOrder(PizzaOrderData orderData)
+    public PizzaOrder? PostNewOrder(NewPizzaOrderRequest orderData)
     {
         var json = JsonSerializer.Serialize(orderData);
         
@@ -55,7 +56,7 @@ public class PizzaHelper
         }
     }
 
-    public bool UpdateOrder(int id, PizzaOrderData orderData)
+    public bool UpdateOrder(int id, UpdatePizzaOrderRequest orderData)
     {
         var json = JsonSerializer.Serialize(orderData);
         var request = PizzaRouteRequest.UpdateOrder(_apiKey, _apiUrl, id, json).GetRequest();

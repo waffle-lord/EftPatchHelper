@@ -1,4 +1,5 @@
-﻿using EftPatchHelper.Interfaces;
+﻿using EftPatchHelper.Helpers;
+using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
 using Spectre.Console;
 
@@ -8,13 +9,15 @@ namespace EftPatchHelper.Tasks
     {
         private Settings _settings;
         private Options _options;
+        private PizzaHelper _pizzaHelper;
 
         List<FileSystemInfo> _fileToRemove = new List<FileSystemInfo>();
 
-        public CleanupTask(Settings settings, Options options)
+        public CleanupTask(Settings settings, Options options, PizzaHelper pizzaHelper)
         {
             _settings = settings;
             _options = options;
+            _pizzaHelper = pizzaHelper;
         }
 
         private void GetPathsToRemove()
@@ -68,7 +71,7 @@ namespace EftPatchHelper.Tasks
             });
         }
 
-        public void Run()
+        public void Run(PizzaOrder? order = null)
         {
             GetPathsToRemove();
 

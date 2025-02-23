@@ -59,7 +59,7 @@ namespace EftPatchHelper.Tasks
             return mirrorListFileInfo.Exists;
         }
 
-        public void Run()
+        public void Run(PizzaOrder? oder = null)
         {
             if (!_settings.UsingR2() || !_options.UplaodToR2)
             {

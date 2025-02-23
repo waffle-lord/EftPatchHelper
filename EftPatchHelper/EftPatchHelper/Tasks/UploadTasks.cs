@@ -173,7 +173,7 @@ namespace EftPatchHelper.Tasks
             return succeeded;
         }
 
-        public void Run()
+        public void Run(PizzaOrder? oder = null)
         {
             if (!_options.UploadToGoFile && !_options.UploadToMega && !_options.UploadToSftpSites && !_options.UplaodToR2) return;
 

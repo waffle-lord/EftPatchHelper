@@ -1,4 +1,5 @@
-﻿using Spectre.Console;
+﻿using EftPatchHelper.Model;
+using Spectre.Console;
 
 namespace EftPatchHelper.Helpers
 {
@@ -10,15 +11,15 @@ namespace EftPatchHelper.Helpers
         /// <summary>
         /// Create a folder copy object
         /// </summary>
-        /// <param name="SourceFolder">The folder to copy</param>
-        /// <param name="DestinationFolder">The folder to copy into</param>
-        public FolderCopy(string SourceFolder, string DestinationFolder)
+        /// <param name="sourceFolder">The folder to copy</param>
+        /// <param name="destinationFolder">The folder to copy into</param>
+        public FolderCopy(string sourceFolder, string destinationFolder)
         {
-            this.SourceFolder = SourceFolder;
-            this.DestinationFolder = DestinationFolder;
+            this.SourceFolder = sourceFolder;
+            this.DestinationFolder = destinationFolder;
         }
 
-        public bool Start(bool IgnoreIfExists = false, bool merge = false)
+        public bool Start(bool ignoreIfExists = false, bool merge = false, IProgress<int>? orderProgress = null)
         {
             DirectoryInfo sourceDir = new DirectoryInfo(SourceFolder);
             DirectoryInfo destDir = new DirectoryInfo(DestinationFolder);
@@ -28,7 +29,7 @@ namespace EftPatchHelper.Helpers
                 destDir.Create();
                 destDir.Refresh();
             }
-            else if (IgnoreIfExists)
+            else if (ignoreIfExists)
             {
                 AnsiConsole.MarkupLine("[yellow]Exists[/]");
                 return true;
@@ -82,6 +83,7 @@ namespace EftPatchHelper.Helpers
                     sourceFileInfo.CopyTo(targetFile, true);
 
                     copyTask.Increment(1);
+                    orderProgress?.Report((int)copyTask.Percentage);
                 }
             });
 
