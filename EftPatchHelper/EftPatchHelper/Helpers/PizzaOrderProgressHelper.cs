@@ -42,7 +42,7 @@ public class PizzaOrderProgressHelper
 
                 var partInfo = _partCount != 1 ? $"{_currentPart + 1} of {_partCount} " : "";
                 var message = 
-                    $"{order.GetCurrentStepLabel()}: {partInfo}- {progress}% | {_message}";
+                    $"{order.GetCurrentStepLabel((int)currentStep)}: {partInfo}- {progress}% | {_message}";
 
                 _pizzaHelper.UpdateOrder(order.Id, new UpdatePizzaOrderRequest(message, currentStep, (int)partProgress));
             });

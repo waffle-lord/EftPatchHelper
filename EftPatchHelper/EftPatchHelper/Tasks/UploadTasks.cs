@@ -190,8 +190,10 @@ namespace EftPatchHelper.Tasks
             return succeeded;
         }
 
-        public void Run(PizzaOrder? order = null)
+        public void Run()
         {
+            var order = _pizzaHelper.GetCurrentOrder();
+            
             if (!_options.UploadToGoFile && !_options.UploadToMega && !_options.UploadToSftpSites && !_options.UplaodToR2) return;
 
             UploadAllFiles(order).GetAwaiter().GetResult().ValidateOrExit();

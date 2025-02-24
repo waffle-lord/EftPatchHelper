@@ -335,7 +335,7 @@ namespace EftPatchHelper
 
         public void Run()
         {
-            _settingsTasks.Run(null);
+            _settingsTasks.Run();
             
             var existingPatchFile = CheckExistingPatchFile();
 
@@ -379,8 +379,7 @@ namespace EftPatchHelper
                     break;
                 case RunOption.GeneratePatches:
                     
-                    _clientSelectionTasks.Run(order);
-
+                    _clientSelectionTasks.Run();
                     
                     if (_settings.UsingPizzaOven() && _options.UpdatePizzaStatus)
                     {
@@ -420,13 +419,13 @@ namespace EftPatchHelper
                             : "[red]Failed to create new order[/]");
                     }
                     
-                    _cleanupTasks.Run(order);
-                    _fileProcessingTasks.Run(order);
-                    _patchGenTasks.Run(order);
-                    _patchTestingTasks.Run(order);
-                    _compressPatcherTasks.Run(order);
-                    _uploadTasks.Run(order);
-                    _uploadMirrorList.Run(order);
+                    _cleanupTasks.Run();
+                    _fileProcessingTasks.Run();
+                    _patchGenTasks.Run();
+                    _patchTestingTasks.Run();
+                    _compressPatcherTasks.Run();
+                    _uploadTasks.Run();
+                    _uploadMirrorList.Run();
                     
                     break;
                 case RunOption.UploadOnly:
@@ -436,8 +435,8 @@ namespace EftPatchHelper
                         return;
                     }
                     
-                    _uploadTasks.Run(order);
-                    _uploadMirrorList.Run(order);
+                    _uploadTasks.Run();
+                    _uploadMirrorList.Run();
                     
                     break;
                 default:

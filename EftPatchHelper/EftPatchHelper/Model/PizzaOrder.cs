@@ -35,11 +35,11 @@ public class PizzaOrder
     [JsonPropertyName("updated_at")]
     public DateTime UpdatedAt { get; set; }
 
-    public string GetCurrentStepLabel()
+    public string GetCurrentStepLabel(int currentStep)
     {
         var labels = StepLabels.Split(",");
 
-        return CurrentStep >= labels.Length || CurrentStep < 0 ? "--ERROR--" : labels[CurrentStep];
+        return currentStep >= labels.Length || currentStep < 0 ? "--ERROR--" : labels[currentStep];
     }
 
     public void AnsiPrint()

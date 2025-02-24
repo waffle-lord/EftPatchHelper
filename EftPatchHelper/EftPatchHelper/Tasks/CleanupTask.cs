@@ -71,7 +71,7 @@ namespace EftPatchHelper.Tasks
             });
         }
 
-        public void Run(PizzaOrder? order = null)
+        public void Run()
         {
             GetPathsToRemove();
 

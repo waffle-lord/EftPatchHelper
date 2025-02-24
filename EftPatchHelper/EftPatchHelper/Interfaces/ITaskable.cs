@@ -8,6 +8,6 @@ namespace EftPatchHelper.Interfaces
         /// Runs a predefined task
         /// </summary>
         /// <returns>Returns true if the task succeeded, otherwise false</returns>
-        public void Run(PizzaOrder? order);
+        public void Run();
     }
 }

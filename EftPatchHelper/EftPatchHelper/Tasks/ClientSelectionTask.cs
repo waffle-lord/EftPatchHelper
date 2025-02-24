@@ -72,7 +72,7 @@ namespace EftPatchHelper.Tasks
             }).GetAwaiter().GetResult();
         }
 
-        public void Run(PizzaOrder? order = null)
+        public void Run()
         {
             var currentReleaseVersion = GetCurrentReleaseVersion();
 

@@ -88,8 +88,10 @@ namespace EftPatchHelper.Tasks
             });
         }
 
-        public void Run(PizzaOrder? order = null)
+        public void Run()
         {
+            var order = _pizzaHelper.GetCurrentOrder();
+            
             if (order != null)
             {
                 var orderUpdate =

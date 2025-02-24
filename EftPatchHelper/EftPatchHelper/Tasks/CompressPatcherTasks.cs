@@ -63,8 +63,10 @@ public class CompressPatcherTasks : ICompressPatcherTasks
             });
     }
 
-    public void Run(PizzaOrder? order = null)
+    public void Run()
     {
+        var order = _pizzaHelper.GetCurrentOrder();
+        
         var orderProgressReporter = new PizzaOrderProgressHelper(_pizzaHelper, 1, "Packing up your order");
         var orderProgress = order != null ? orderProgressReporter.GetProgressReporter(order, PizzaOrderStep.Pack) : null;
         

@@ -13,7 +13,6 @@ namespace EftPatchHelper.Tasks
         Settings _settings;
         Options _options;
         PizzaHelper _pizzaHelper;
-        private PizzaOrder? _order;
 
         public FileProcessingTasks(Settings settings, Options options, PizzaHelper pizzaHelper)
         {
@@ -46,9 +45,9 @@ namespace EftPatchHelper.Tasks
             FolderCleaner.Clean(_options.SourceClient.PrepPath);
         }
 
-        public void Run(PizzaOrder? order = null)
+        public void Run()
         {
-            _order = order;
+            var order = _pizzaHelper.GetCurrentOrder();
             
             var orderProgressHelper = new PizzaOrderProgressHelper(_pizzaHelper, 3, "Backing up some data");
             var orderProgress = order != null ? orderProgressHelper.GetProgressReporter(order, PizzaOrderStep.Setup) : null;
