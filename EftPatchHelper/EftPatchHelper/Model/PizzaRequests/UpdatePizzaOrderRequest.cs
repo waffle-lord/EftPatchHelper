@@ -13,11 +13,11 @@ public class UpdatePizzaOrderRequest
     
     [JsonPropertyName("current_step")]
     public int CurrentStep { get; set; }
-
-    public UpdatePizzaOrderRequest(string message, int currentStep, int stepProgress)
+    
+    public UpdatePizzaOrderRequest(string message, PizzaOrderStep currentStep, int stepProgress)
     {
         Message = message;
-        CurrentStep = currentStep;
+        CurrentStep = (int)currentStep;
         StepProgress = stepProgress;
     }
     
@@ -25,7 +25,10 @@ public class UpdatePizzaOrderRequest
     {
         AnsiConsole.MarkupLine($"=== [green] Update order[/] [purple]{currentOrder.OrderNumber}[/] ===");
         var message = new TextPrompt<string>("Enter message: ").Show(AnsiConsole.Console);
-        var currentStep = new TextPrompt<int>("Enter current step: ").Show(AnsiConsole.Console);
+        
+        var currentStep = new TextPrompt<PizzaOrderStep>("Enter current step: ").Show(AnsiConsole.Console);
+        
+        
         var stepProgress = new TextPrompt<int>("Enter progress: ").Show(AnsiConsole.Console);
 
         return new UpdatePizzaOrderRequest(message, currentStep, stepProgress);

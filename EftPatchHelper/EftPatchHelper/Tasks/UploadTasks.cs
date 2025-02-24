@@ -3,6 +3,7 @@ using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
 using Spectre.Console;
 using EftPatchHelper.Helpers;
+using EftPatchHelper.Model.PizzaRequests;
 
 namespace EftPatchHelper.Tasks
 {
@@ -11,16 +12,18 @@ namespace EftPatchHelper.Tasks
         private readonly Options _options;
         private readonly Settings _settings;
         private readonly FileHelper _fileHelper;
+        private readonly PizzaHelper _pizzaHelper;
         private readonly R2Helper _r2;
         private readonly List<IFileUpload> _fileUploads = new();
         private readonly Dictionary<IFileUpload, ProgressTask> _uploadTasks = new();
 
-        public UploadTasks(Options options, Settings settings, R2Helper r2, FileHelper fileHelper)
+        public UploadTasks(Options options, Settings settings, R2Helper r2, FileHelper fileHelper, PizzaHelper pizzaHelper)
         {
             _options = options;
             _settings = settings;
             _r2 = r2;
             _fileHelper = fileHelper;
+            _pizzaHelper = pizzaHelper;
         }
 
         private async Task<bool> BuildUploadList()
@@ -118,14 +121,14 @@ namespace EftPatchHelper.Tasks
             }
         }
 
-        private async Task<bool> UploadAllFiles()
+        private async Task<bool> UploadAllFiles(PizzaOrder? order)
         {
+            AnsiConsole.MarkupLine($"[blue]Starting {_fileUploads[0].UploadFileInfo.Name} uploads ...[/]");
+            
             if(!await BuildUploadList())
             {
                 return false;
             }
-            
-            AnsiConsole.MarkupLine($"[blue]Starting {_fileUploads[0].UploadFileInfo.Name} uploads ...[/]");
 
             var succeeded = await AnsiConsole.Progress().Columns(
                 new TaskDescriptionColumn() { Alignment = Justify.Left},
@@ -133,8 +136,16 @@ namespace EftPatchHelper.Tasks
                 new PercentageColumn(),
                 new RemainingTimeColumn(),
                 new SpinnerColumn(Spinner.Known.Dots2)
-                ).StartAsync<bool>(async context => 
-                {
+                ).StartAsync<bool>(async context =>
+            {
+                
+                    var orderProgressReporter = new PizzaOrderProgressHelper(_pizzaHelper, _fileUploads.Count,
+                        "We are preparing to upload your order", -1);
+
+                    var orderProgress = order != null
+                        ? orderProgressReporter.GetProgressReporter(order, PizzaOrderStep.Upload)
+                        : null;
+                    
                     foreach(var file in _fileUploads)
                     {
                         var task = context.AddTask($"[purple][[Pending]][/] {file.DisplayName} - [blue]{file.UploadFileInfo.HumanLength()}[/]");
@@ -144,8 +155,13 @@ namespace EftPatchHelper.Tasks
 
                     foreach(var pair in _uploadTasks)
                     {
+                        orderProgressReporter.IncrementPart($"Uploading {pair.Key.ServiceName} - {pair.Key.UploadFileInfo.HumanLength()}");
                         // set the value of the progress task object
-                        var progress = new System.Progress<double>((d) => pair.Value.Value = d);
+                        var progress = new System.Progress<double>((d) =>
+                        {
+                            pair.Value.Value = d;
+                            orderProgress?.Report((int)d);
+                        });
 
                         pair.Value.IsIndeterminate = false;
                         pair.Value.Description = $"{pair.Key.DisplayName} - [blue]{pair.Key.UploadFileInfo.HumanLength()}[/]";
@@ -165,6 +181,7 @@ namespace EftPatchHelper.Tasks
 
                             _options.MirrorList.Add(pair.Key.HubEntryText, mirror);
                         }
+                        
                     }
 
                     return _options.MirrorList.Count > 0;
@@ -173,11 +190,11 @@ namespace EftPatchHelper.Tasks
             return succeeded;
         }
 
-        public void Run(PizzaOrder? oder = null)
+        public void Run(PizzaOrder? order = null)
         {
             if (!_options.UploadToGoFile && !_options.UploadToMega && !_options.UploadToSftpSites && !_options.UplaodToR2) return;
 
-            UploadAllFiles().GetAwaiter().GetResult().ValidateOrExit();
+            UploadAllFiles(order).GetAwaiter().GetResult().ValidateOrExit();
 
             CreateHubEntrySource();
         }

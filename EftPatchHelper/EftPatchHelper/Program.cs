@@ -422,11 +422,11 @@ namespace EftPatchHelper
                     
                     _cleanupTasks.Run(order);
                     _fileProcessingTasks.Run(order);
-                    // _patchGenTasks.Run(order);
-                    // _patchTestingTasks.Run(order);
-                    // _compressPatcherTasks.Run(order);
-                    // _uploadTasks.Run(order);
-                    // _uploadMirrorList.Run(order);
+                    _patchGenTasks.Run(order);
+                    _patchTestingTasks.Run(order);
+                    _compressPatcherTasks.Run(order);
+                    _uploadTasks.Run(order);
+                    _uploadMirrorList.Run(order);
                     
                     break;
                 case RunOption.UploadOnly:

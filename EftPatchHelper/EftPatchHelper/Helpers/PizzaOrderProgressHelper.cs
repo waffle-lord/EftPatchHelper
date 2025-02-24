@@ -7,7 +7,7 @@ public class PizzaOrderProgressHelper
 {
     private int _partCount;
 
-    private int _currentPart = 0;
+    private int _currentPart;
 
     private DateTime _lastUpdate;
 
@@ -15,15 +15,16 @@ public class PizzaOrderProgressHelper
     
     private PizzaHelper _pizzaHelper;
 
-    public PizzaOrderProgressHelper(PizzaHelper pizzaHelper, int partCount = 0, string initialMessage = "")
+    public PizzaOrderProgressHelper(PizzaHelper pizzaHelper, int partCount = 0, string initialMessage = "", int overrideStartingPart = 0)
     {
         _pizzaHelper = pizzaHelper;
         _partCount = partCount;
         _message = initialMessage;
         _lastUpdate = DateTime.Now;
+        _currentPart = overrideStartingPart;
     }
 
-    public IProgress<int> GetProgressReporter(PizzaOrder order, int currentStep)
+    public IProgress<int> GetProgressReporter(PizzaOrder order, PizzaOrderStep currentStep)
     {
         return new Progress<int>(progress =>
             {
@@ -39,8 +40,9 @@ public class PizzaOrderProgressHelper
                 var partProgress = 
                     (double)progress / 100 * ((double)partOffset / 100) * 100 + _currentPart * partOffset;
 
+                var partInfo = _partCount != 1 ? $"{_currentPart + 1} of {_partCount} " : "";
                 var message = 
-                    $"{order.GetCurrentStepLabel()}: {_currentPart + 1} of {_partCount} - {progress}% | {_message}";
+                    $"{order.GetCurrentStepLabel()}: {partInfo}- {progress}% | {_message}";
 
                 _pizzaHelper.UpdateOrder(order.Id, new UpdatePizzaOrderRequest(message, currentStep, (int)partProgress));
             });

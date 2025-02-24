@@ -3,6 +3,7 @@ using EftPatchHelper.Extensions;
 using EftPatchHelper.Helpers;
 using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
+using EftPatchHelper.Model.PizzaRequests;
 using Spectre.Console;
 
 namespace EftPatchHelper.Tasks
@@ -50,7 +51,7 @@ namespace EftPatchHelper.Tasks
             _order = order;
             
             var orderProgressHelper = new PizzaOrderProgressHelper(_pizzaHelper, 3, "Backing up some data");
-            var orderProgress = order != null ? orderProgressHelper.GetProgressReporter(order, 0) : null;
+            var orderProgress = order != null ? orderProgressHelper.GetProgressReporter(order, PizzaOrderStep.Setup) : null;
             
             AnsiConsole.Write(new Rule("Starting Tasks, this will take some time :)"));
             
