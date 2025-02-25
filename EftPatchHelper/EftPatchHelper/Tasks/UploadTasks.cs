@@ -123,12 +123,12 @@ namespace EftPatchHelper.Tasks
 
         private async Task<bool> UploadAllFiles(PizzaOrder? order)
         {
-            AnsiConsole.MarkupLine($"[blue]Starting {_fileUploads[0].UploadFileInfo.Name} uploads ...[/]");
-            
             if(!await BuildUploadList())
             {
                 return false;
             }
+            
+            AnsiConsole.MarkupLine($"[blue]Starting {_fileUploads[0].UploadFileInfo.Name} uploads ...[/]");
 
             var succeeded = await AnsiConsole.Progress().Columns(
                 new TaskDescriptionColumn() { Alignment = Justify.Left},
@@ -155,7 +155,7 @@ namespace EftPatchHelper.Tasks
 
                     foreach(var pair in _uploadTasks)
                     {
-                        orderProgressReporter.IncrementPart($"Uploading {pair.Key.ServiceName} - {pair.Key.UploadFileInfo.HumanLength()}");
+                        orderProgressReporter.IncrementPart($"{pair.Key.ServiceName} - {pair.Key.UploadFileInfo.HumanLength()}");
                         // set the value of the progress task object
                         var progress = new System.Progress<double>((d) =>
                         {
@@ -194,7 +194,7 @@ namespace EftPatchHelper.Tasks
         {
             var order = _pizzaHelper.GetCurrentOrder();
             
-            if (!_options.UploadToGoFile && !_options.UploadToMega && !_options.UploadToSftpSites && !_options.UplaodToR2) return;
+            if (_options is { UploadToGoFile: false, UploadToMega: false, UploadToSftpSites: false, UplaodToR2: false }) return;
 
             UploadAllFiles(order).GetAwaiter().GetResult().ValidateOrExit();
 
