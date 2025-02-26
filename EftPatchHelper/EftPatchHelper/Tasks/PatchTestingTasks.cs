@@ -4,6 +4,7 @@ using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
 using Spectre.Console;
 using System.Diagnostics;
+using EftPatchHelper.Model.PizzaRequests;
 
 namespace EftPatchHelper.Tasks
 {
@@ -11,11 +12,13 @@ namespace EftPatchHelper.Tasks
     {
         private Settings _settings;
         private Options _options;
+        private PizzaHelper _pizzaHelper;
 
-        public PatchTestingTasks(Settings settings, Options options)
+        public PatchTestingTasks(Settings settings, Options options, PizzaHelper pizzaHelper)
         {
             _settings = settings;
             _options = options;
+            _pizzaHelper = pizzaHelper;
         }
 
         private bool CopySourceToPrep()
@@ -76,6 +79,16 @@ namespace EftPatchHelper.Tasks
 
         public void Run()
         {
+            var order = _pizzaHelper.GetCurrentOrder();
+            
+            if (order != null)
+            {
+                var orderUpdate =
+                    new UpdatePizzaOrderRequest("Taste testing the patches (for quality, of course)", PizzaOrderStep.Test, -1);
+
+                _pizzaHelper.UpdateOrder(order.Id, orderUpdate);
+            }
+            
             CopySourceToPrep().ValidateOrExit();
 
             RunPatcher().ValidateOrExit();

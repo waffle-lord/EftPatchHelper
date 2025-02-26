@@ -3,6 +3,7 @@ using EftPatchHelper.Model;
 using Spectre.Console;
 using System.Text.Json;
 using EftPatchHelper.Helpers;
+using EftPatchHelper.Model.PizzaRequests;
 
 namespace EftPatchHelper.Tasks
 {
@@ -11,12 +12,14 @@ namespace EftPatchHelper.Tasks
         private Settings _settings;
         private Options _options;
         private R2Helper _r2;
+        private PizzaHelper _pizzaHelper;
 
-        public UploadMirrorListTasks(Settings settigns, Options options, R2Helper r2)
+        public UploadMirrorListTasks(Settings settigns, Options options, R2Helper r2, PizzaHelper pizzaHelper)
         {
             _settings = settigns;
             _options = options;
             _r2 = r2;
+            _pizzaHelper = pizzaHelper;
         }
 
         private async Task<bool> UploadMirrorList(FileInfo file)
@@ -72,7 +75,25 @@ namespace EftPatchHelper.Tasks
 
             CreateMirrorList(fileInfo);
 
-            UploadMirrorList(fileInfo).GetAwaiter().GetResult();
+            var success = UploadMirrorList(fileInfo).GetAwaiter().GetResult();
+            
+            var order = _pizzaHelper.GetCurrentOrder();
+
+            if (order == null)
+            {
+                return;
+            }
+
+            if (!success)
+            {
+                _pizzaHelper.CancelOrder(order.Id);
+                return;
+            }
+
+            var request = new UpdatePizzaOrderRequest("Order Complete", PizzaOrderStep.Upload, 100);
+            
+            _pizzaHelper.UpdateOrder(order.Id, request);
+            AnsiConsole.WriteLine($"Order #{order.OrderNumber} Completed");
         }
     }
 }

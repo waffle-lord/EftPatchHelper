@@ -3,6 +3,7 @@ using EftPatchHelper.Extensions;
 using EftPatchHelper.Helpers;
 using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
+using EftPatchHelper.Model.PizzaRequests;
 using Spectre.Console;
 
 namespace EftPatchHelper.Tasks
@@ -11,29 +12,31 @@ namespace EftPatchHelper.Tasks
     {
         Settings _settings;
         Options _options;
+        PizzaHelper _pizzaHelper;
 
-        public FileProcessingTasks(Settings settings, Options options)
+        public FileProcessingTasks(Settings settings, Options options, PizzaHelper pizzaHelper)
         {
             _settings = settings;
             _options = options;
+            _pizzaHelper = pizzaHelper;
         }
 
-        private bool BackupClients()
+        private bool BackupClients(IProgress<int>? orderProgress)
         {
-            bool targetOK = _options.TargetClient.Backup(_settings, _options.IgnoreExistingDirectories);
-            bool sourceOK = _options.SourceClient.Backup(_settings, _options.IgnoreExistingDirectories);
+            bool targetOK = _options.TargetClient.Backup(_settings, _options.IgnoreExistingDirectories, orderProgress);
+            bool sourceOK = _options.SourceClient.Backup(_settings, _options.IgnoreExistingDirectories, orderProgress);
 
             return targetOK && sourceOK;
         }
 
-        private bool CopyData(EftClient client, string message)
+        private bool CopyData(EftClient client, string message, IProgress<int>? orderProgress)
         {
             AnsiConsole.WriteLine();
             AnsiConsole.MarkupLine(message);
 
             var folderCopy = new FolderCopy(client.FolderPath, client.PrepPath);
 
-            return folderCopy.Start(_options.IgnoreExistingDirectories);
+            return folderCopy.Start(_options.IgnoreExistingDirectories, orderProgress: orderProgress);
         }
 
         private void CleanPrepFolders()
@@ -44,12 +47,20 @@ namespace EftPatchHelper.Tasks
 
         public void Run()
         {
+            var order = _pizzaHelper.GetCurrentOrder();
+            
+            var orderProgressHelper = new PizzaOrderProgressHelper(_pizzaHelper, 3, "Backing up some data");
+            var orderProgress = order != null ? orderProgressHelper.GetProgressReporter(order, PizzaOrderStep.Setup) : null;
+            
             AnsiConsole.Write(new Rule("Starting Tasks, this will take some time :)"));
+            
+            BackupClients(orderProgress).ValidateOrExit();
 
-            BackupClients().ValidateOrExit();
-
-            CopyData(_options.SourceClient, "[gray]Copying[/] [blue]source[/][gray] to prep area ...[/]").ValidateOrExit();
-            CopyData(_options.TargetClient, "[gray]Copying[/] [blue]target[/][gray] to prep area ...[/]").ValidateOrExit();
+            orderProgressHelper.IncrementPart("Copying source files to prep area");
+            CopyData(_options.SourceClient, "[gray]Copying[/] [blue]source[/][gray] to prep area ...[/]", orderProgress).ValidateOrExit();
+            
+            orderProgressHelper.IncrementPart("Copying target files to prep area");
+            CopyData(_options.TargetClient, "[gray]Copying[/] [blue]target[/][gray] to prep area ...[/]", orderProgress).ValidateOrExit();
 
             CleanPrepFolders();
         }

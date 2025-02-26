@@ -1,4 +1,6 @@
-﻿namespace EftPatchHelper.Interfaces
+﻿using EftPatchHelper.Model;
+
+namespace EftPatchHelper.Interfaces
 {
     public interface ITaskable
     {

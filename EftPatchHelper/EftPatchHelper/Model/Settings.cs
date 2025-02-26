@@ -65,6 +65,12 @@ namespace EftPatchHelper.Model
 
         [JsonPropertyName("sftpUploads")]
         public List<SftpUploadInfo> SftpUploads { get; set; } = new();
+        
+        [JsonPropertyName("pizzaApiUrl")]
+        public string PizzaApiUrl { get; set; } = "";
+        
+        [JsonPropertyName("pizzaApiKey")]
+        public string PizzaApiKey { get; set; } = "";
 
         public bool Save()
         {
@@ -91,46 +97,35 @@ namespace EftPatchHelper.Model
 
         public bool UsingMega()
         {
-            if (string.IsNullOrWhiteSpace(MegaEmail)) return false;
-
-            if (string.IsNullOrWhiteSpace(MegaPassword)) return false;
-
-            return true;
+            return !string.IsNullOrWhiteSpace(MegaEmail) && !string.IsNullOrWhiteSpace(MegaPassword);
         }
 
         public bool UsingGoFile()
         {
-            if (string.IsNullOrWhiteSpace(GoFileApiKey)) return false;
-
-            if(string.IsNullOrWhiteSpace(GoFileFolderId)) return false;
-
-            return true;
+            return !string.IsNullOrWhiteSpace(GoFileApiKey) && !string.IsNullOrWhiteSpace(GoFileFolderId);
         }
 
         public bool UsingR2()
         {
-            if (string.IsNullOrWhiteSpace(R2ConnectedDomainUrl)) return false;
-            if (string.IsNullOrWhiteSpace(R2ServiceUrl)) return false;
-            if (string.IsNullOrWhiteSpace(R2BucketName)) return false;
-            if (string.IsNullOrWhiteSpace(R2AccessKeyId)) return false;
-            if (string.IsNullOrWhiteSpace(R2SecretKeyId)) return false;
+            return !string.IsNullOrWhiteSpace(R2ConnectedDomainUrl)
+                   && !string.IsNullOrWhiteSpace(R2ServiceUrl)
+                   && !string.IsNullOrWhiteSpace(R2BucketName)
+                   && !string.IsNullOrWhiteSpace(R2AccessKeyId)
+                   && !string.IsNullOrWhiteSpace(R2SecretKeyId);
+        }
 
-            return true;
+        public bool UsingPizzaOven()
+        {
+            return !string.IsNullOrWhiteSpace(PizzaApiKey) && !string.IsNullOrWhiteSpace(PizzaApiUrl);
         }
 
         public bool Validate()
         {
-            if (string.IsNullOrWhiteSpace(TargetEftVersion)) return false;
-
-            if (string.IsNullOrWhiteSpace(PrepFolderPath)) return false;
-
-            if (string.IsNullOrWhiteSpace(BackupFolderPath)) return false;
-
-            if (string.IsNullOrWhiteSpace(LiveEftPath)) return false;
-
-            if (string.IsNullOrWhiteSpace(PatcherEXEPath)) return false;
-
-            return true;
+            return !string.IsNullOrWhiteSpace(TargetEftVersion)
+                   && !string.IsNullOrWhiteSpace(PrepFolderPath)
+                   && !string.IsNullOrWhiteSpace(BackupFolderPath)
+                   && !string.IsNullOrWhiteSpace(LiveEftPath)
+                   && !string.IsNullOrWhiteSpace(PatcherEXEPath);
         }
     }
 }

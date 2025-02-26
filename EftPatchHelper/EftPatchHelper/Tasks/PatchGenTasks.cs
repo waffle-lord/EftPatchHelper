@@ -3,6 +3,8 @@ using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
 using Spectre.Console;
 using System.Diagnostics;
+using EftPatchHelper.Helpers;
+using EftPatchHelper.Model.PizzaRequests;
 
 namespace EftPatchHelper.Tasks
 {
@@ -10,11 +12,13 @@ namespace EftPatchHelper.Tasks
     {
         private Settings _settings;
         private Options _options;
+        private PizzaHelper _pizzaHelper;
 
-        public PatchGenTasks(Settings settings, Options options)
+        public PatchGenTasks(Settings settings, Options options, PizzaHelper pizzaHelper)
         {
             _settings = settings;
             _options = options;
+            _pizzaHelper = pizzaHelper;
         }
 
         private bool RunPatchGenerator()
@@ -86,6 +90,16 @@ namespace EftPatchHelper.Tasks
 
         public void Run()
         {
+            var order = _pizzaHelper.GetCurrentOrder();
+            
+            if (order != null)
+            {
+                var orderUpdate =
+                    new UpdatePizzaOrderRequest("Generating some delicious patches", PizzaOrderStep.Patch, -1);
+
+                _pizzaHelper.UpdateOrder(order.Id, orderUpdate);
+            }
+
             RunPatchGenerator().ValidateOrExit();
         }
     }

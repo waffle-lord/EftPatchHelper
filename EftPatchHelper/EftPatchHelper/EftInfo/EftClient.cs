@@ -12,7 +12,7 @@ namespace EftPatchHelper.EftInfo
         public string PrepPath { get; set; }
         public EftClientLocation Location { get; set; }
 
-        public bool Backup(Settings settings, bool IgnoreIfexists = false)
+        public bool Backup(Settings settings, bool IgnoreIfexists = false, IProgress<int>? orderProgress = null)
         {
             string backupPath = Path.Join(settings.BackupFolderPath, Version);
 
@@ -22,7 +22,7 @@ namespace EftPatchHelper.EftInfo
 
             FolderCopy backup = new FolderCopy(FolderPath, backupPath);
 
-            return backup.Start(IgnoreIfexists);
+            return backup.Start(IgnoreIfexists, orderProgress: orderProgress);
         }
     }
 }

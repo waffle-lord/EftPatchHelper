@@ -1,0 +1,77 @@
+using System.Text.Json;
+using EftPatchHelper.Model;
+using EftPatchHelper.Model.PizzaRequests;
+
+namespace EftPatchHelper.Helpers;
+
+public class PizzaHelper
+{
+    private readonly string _apiKey = "";
+    private readonly string _apiUrl = "";
+    private readonly HttpClient _client;
+    
+    public PizzaHelper(Settings settings, HttpClient httpClient)
+    {
+        _client = httpClient;
+
+        if (!settings.UsingPizzaOven())
+        {
+            return;
+        }
+        
+        _apiKey = settings.PizzaApiKey;
+        _apiUrl = settings.PizzaApiUrl;
+    }
+
+    public PizzaOrder? PostNewOrder(NewPizzaOrderRequest orderData)
+    {
+        var json = JsonSerializer.Serialize(orderData);
+        
+        var request = PizzaRouteRequest.NewOrder(_apiKey, _apiUrl, json).GetRequest();
+        
+        var response = _client.Send(request);
+
+        json = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
+        var order = JsonSerializer.Deserialize<DataResponse<PizzaOrder>>(json);
+
+        return order?.Data ?? null;
+    }
+
+    public PizzaOrder? GetCurrentOrder()
+    {
+        var request = PizzaRouteRequest.GetCurrentOrder(_apiKey, _apiUrl).GetRequest();
+
+        var response = _client.Send(request);
+        var json = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
+        try
+        {
+            var order = JsonSerializer.Deserialize<DataResponse<PizzaOrder>>(json);
+            return order?.Data ?? null;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    public bool UpdateOrder(int id, UpdatePizzaOrderRequest orderData)
+    {
+        var json = JsonSerializer.Serialize(orderData);
+        var request = PizzaRouteRequest.UpdateOrder(_apiKey, _apiUrl, id, json).GetRequest();
+        
+        var response = _client.Send(request);
+        
+        return response.IsSuccessStatusCode;
+    }
+
+    public bool CancelOrder(int id)
+    {
+        var request = PizzaRouteRequest.CancelOrder(_apiKey, _apiUrl, id).GetRequest();
+
+        var response = _client.Send(request);
+        
+        return response.IsSuccessStatusCode;
+    }
+}
