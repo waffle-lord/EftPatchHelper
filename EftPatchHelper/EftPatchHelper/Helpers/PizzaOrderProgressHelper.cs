@@ -15,8 +15,18 @@ public class PizzaOrderProgressHelper
     
     private PizzaHelper _pizzaHelper;
 
-    public PizzaOrderProgressHelper(PizzaHelper pizzaHelper, int partCount = 0, string initialMessage = "", int overrideStartingPart = 0)
+    public PizzaOrderProgressHelper(PizzaHelper pizzaHelper, int partCount, string initialMessage = "", int overrideStartingPart = 0)
     {
+        if (partCount <= 0)
+        {
+            throw new ArgumentException("Part count must be greater than 0", nameof(partCount));
+        }
+
+        if (overrideStartingPart < 0)
+        {
+            throw new ArgumentException("Override part count must be greater than 0", nameof(overrideStartingPart));
+        }
+        
         _pizzaHelper = pizzaHelper;
         _partCount = partCount;
         _message = initialMessage;
