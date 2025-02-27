@@ -1,6 +1,8 @@
-﻿using PizzaOvenApi.Model.PizzaRequests;
+﻿using PizzaOvenApi;
+using PizzaOvenApi.Model;
+using PizzaOvenApi.Model.PizzaRequests;
 
-namespace PizzaOvenApi.Model;
+namespace EftPatchHelper.Helpers;
 
 public class PizzaOrderProgressHelper
 {

@@ -3,7 +3,6 @@ using EftPatchHelper.Helpers;
 using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
 using PizzaOvenApi;
-using PizzaOvenApi.Model;
 using PizzaOvenApi.Model.PizzaRequests;
 using Spectre.Console;
 

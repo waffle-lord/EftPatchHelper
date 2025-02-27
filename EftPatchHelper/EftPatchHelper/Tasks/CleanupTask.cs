@@ -1,5 +1,4 @@
-﻿using EftPatchHelper.Helpers;
-using EftPatchHelper.Interfaces;
+﻿using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
 using PizzaOvenApi;
 using Spectre.Console;

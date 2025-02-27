@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using EftPatchHelper.EftInfo;
-using EftPatchHelper.Extensions;
+﻿using EftPatchHelper.Extensions;
 using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
 using Spectre.Console;
