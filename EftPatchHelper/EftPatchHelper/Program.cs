@@ -451,6 +451,7 @@ namespace EftPatchHelper
             return Host.CreateDefaultBuilder(args).ConfigureServices((_, services) =>
             {
                 var client = new HttpClient() { Timeout = TimeSpan.FromHours(1) };
+                PizzaApi? pizzaApi = null;
                 
                 services.AddSingleton<Options>();
                 services.AddSingleton(client);
@@ -459,13 +460,24 @@ namespace EftPatchHelper
                     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
                     var settings = configuration.Get<Settings>();
                     if (settings == null) throw new Exception("Failed to retrieve settings");
+
+                    if (settings.UsingPizzaOven())
+                    {
+                        pizzaApi = new PizzaApi(settings.PizzaApiKey, settings.PizzaApiUrl, client);
+                    }
+                    
                     return settings;
                 });
+
+                if (pizzaApi != null)
+                {
+                    services.AddSingleton(pizzaApi);
+                }
+                
 
                 services.AddSingleton<FileHelper>();
                 services.AddSingleton<ZipHelper>();
                 services.AddSingleton<R2Helper>();
-                services.AddSingleton<PizzaApi>();
 
                 services.AddScoped<EftClientSelector>();
                 

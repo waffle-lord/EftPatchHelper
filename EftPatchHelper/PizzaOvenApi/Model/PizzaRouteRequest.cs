@@ -40,6 +40,12 @@ public class PizzaRouteRequest
         url = CombineUrl(url, "orders/current");
         return new PizzaRouteRequest(HttpMethod.Get, apiKey, url);
     }
+
+    public static PizzaRouteRequest GetLastCompletedOrder(string apiKey, string url)
+    {
+        url = CombineUrl(url, "orders/lastCompleted");
+        return new PizzaRouteRequest(HttpMethod.Get, apiKey, url);
+    }
     
     public static PizzaRouteRequest NewOrder(string apiKey, string url, string json)
     {
