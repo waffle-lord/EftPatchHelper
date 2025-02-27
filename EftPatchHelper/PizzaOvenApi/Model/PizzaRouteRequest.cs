@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace EftPatchHelper.Model;
+namespace PizzaOvenApi.Model;
 
 public class PizzaRouteRequest
 {

@@ -3,7 +3,8 @@ using EftPatchHelper.Model;
 using Spectre.Console;
 using System.Text.Json;
 using EftPatchHelper.Helpers;
-using EftPatchHelper.Model.PizzaRequests;
+using PizzaOvenApi;
+using PizzaOvenApi.Model.PizzaRequests;
 
 namespace EftPatchHelper.Tasks
 {
@@ -12,14 +13,14 @@ namespace EftPatchHelper.Tasks
         private Settings _settings;
         private Options _options;
         private R2Helper _r2;
-        private PizzaHelper _pizzaHelper;
+        private PizzaApi _pizzaApi;
 
-        public UploadMirrorListTasks(Settings settigns, Options options, R2Helper r2, PizzaHelper pizzaHelper)
+        public UploadMirrorListTasks(Settings settigns, Options options, R2Helper r2, PizzaApi pizzaApi)
         {
             _settings = settigns;
             _options = options;
             _r2 = r2;
-            _pizzaHelper = pizzaHelper;
+            _pizzaApi = pizzaApi;
         }
 
         private async Task<bool> UploadMirrorList(FileInfo file)
@@ -77,7 +78,7 @@ namespace EftPatchHelper.Tasks
 
             var success = UploadMirrorList(fileInfo).GetAwaiter().GetResult();
             
-            var order = _pizzaHelper.GetCurrentOrder();
+            var order = _pizzaApi.GetCurrentOrder();
 
             if (order == null)
             {
@@ -86,13 +87,13 @@ namespace EftPatchHelper.Tasks
 
             if (!success)
             {
-                _pizzaHelper.CancelOrder(order.Id);
+                _pizzaApi.CancelOrder(order.Id);
                 return;
             }
 
             var request = new UpdatePizzaOrderRequest("Order Complete", PizzaOrderStep.Upload, 100);
             
-            _pizzaHelper.UpdateOrder(order.Id, request);
+            _pizzaApi.UpdateOrder(order.Id, request);
             AnsiConsole.WriteLine($"Order #{order.OrderNumber} Completed");
         }
     }

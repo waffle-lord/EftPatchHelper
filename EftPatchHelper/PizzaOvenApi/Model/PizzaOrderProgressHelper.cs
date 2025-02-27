@@ -1,7 +1,6 @@
-﻿using EftPatchHelper.Model;
-using EftPatchHelper.Model.PizzaRequests;
+﻿using PizzaOvenApi.Model.PizzaRequests;
 
-namespace EftPatchHelper.Helpers;
+namespace PizzaOvenApi.Model;
 
 public class PizzaOrderProgressHelper
 {
@@ -13,9 +12,9 @@ public class PizzaOrderProgressHelper
 
     private string _message;
     
-    private PizzaHelper _pizzaHelper;
+    private PizzaApi _pizzaApi;
 
-    public PizzaOrderProgressHelper(PizzaHelper pizzaHelper, int partCount, string initialMessage = "", int overrideStartingPart = 0)
+    public PizzaOrderProgressHelper(PizzaApi pizzaApi, int partCount, string initialMessage = "", int overrideStartingPart = 0)
     {
         if (partCount <= 0)
         {
@@ -27,7 +26,7 @@ public class PizzaOrderProgressHelper
             throw new ArgumentException("Override part count must be greater than 0", nameof(overrideStartingPart));
         }
         
-        _pizzaHelper = pizzaHelper;
+        _pizzaApi = pizzaApi;
         _partCount = partCount;
         _message = initialMessage;
         _lastUpdate = DateTime.Now;
@@ -54,7 +53,7 @@ public class PizzaOrderProgressHelper
                 var message = 
                     $"{order.GetCurrentStepLabel((int)currentStep)}: {partInfo}- {progress}% | {_message}";
 
-                _pizzaHelper.UpdateOrder(order.Id, new UpdatePizzaOrderRequest(message, currentStep, (int)partProgress));
+                _pizzaApi.UpdateOrder(order.Id, new UpdatePizzaOrderRequest(message, currentStep, (int)partProgress));
             });
     }
 

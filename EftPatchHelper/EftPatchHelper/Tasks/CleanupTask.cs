@@ -1,6 +1,7 @@
 ﻿using EftPatchHelper.Helpers;
 using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
+using PizzaOvenApi;
 using Spectre.Console;
 
 namespace EftPatchHelper.Tasks
@@ -9,15 +10,15 @@ namespace EftPatchHelper.Tasks
     {
         private Settings _settings;
         private Options _options;
-        private PizzaHelper _pizzaHelper;
+        private PizzaApi _pizzaApi;
 
         List<FileSystemInfo> _fileToRemove = new List<FileSystemInfo>();
 
-        public CleanupTask(Settings settings, Options options, PizzaHelper pizzaHelper)
+        public CleanupTask(Settings settings, Options options, PizzaApi pizzaApi)
         {
             _settings = settings;
             _options = options;
-            _pizzaHelper = pizzaHelper;
+            _pizzaApi = pizzaApi;
         }
 
         private void GetPathsToRemove()

@@ -1,77 +1,65 @@
-using System.Text.Json;
-using EftPatchHelper.Model;
-using EftPatchHelper.Model.PizzaRequests;
+﻿using PizzaOvenApi.Model;
+using PizzaOvenApi.Model.PizzaRequests;
+using Spectre.Console;
 
 namespace EftPatchHelper.Helpers;
 
-public class PizzaHelper
+public static class PizzaHelper
 {
-    private readonly string _apiKey = "";
-    private readonly string _apiUrl = "";
-    private readonly HttpClient _client;
+    public static void AnsiPrint(PizzaOrder order)
+    {
+        AnsiConsole.MarkupLine("=== Current Open Order ===");
+        AnsiConsole.MarkupLine($"Order #       : [blue]{order.OrderNumber}[/]");
+        AnsiConsole.MarkupLine($"Message       : [blue]{order.Message.EscapeMarkup()}[/]");
+        AnsiConsole.MarkupLine($"Status        : [blue]{order.Status}[/]");
+        AnsiConsole.MarkupLine($"Labels        : [blue]{order.StepLabels}[/]");
+        AnsiConsole.MarkupLine($"Current Step  : [blue]{order.CurrentStep}[/]");
+        AnsiConsole.MarkupLine($"Step Progress : [blue]{order.StepProgress}[/]");
+    }
     
-    public PizzaHelper(Settings settings, HttpClient httpClient)
+    public static NewPizzaOrderRequest PromptCreate()
     {
-        _client = httpClient;
+        AnsiConsole.MarkupLine("=== [green] Creating new order[/] ===");
+        
+        var orderNumber = new TextPrompt<int>("Enter order number: ").Show(AnsiConsole.Console);
 
-        if (!settings.UsingPizzaOven())
+        if (orderNumber <= 0)
         {
-            return;
+            throw new ApplicationException("Please enter a valid order number.");
         }
         
-        _apiKey = settings.PizzaApiKey;
-        _apiUrl = settings.PizzaApiUrl;
-    }
+        var useBlankOrder = new ConfirmationPrompt("Use blank order template?").Show(AnsiConsole.Console);
 
-    public PizzaOrder? PostNewOrder(NewPizzaOrderRequest orderData)
-    {
-        var json = JsonSerializer.Serialize(orderData);
-        
-        var request = PizzaRouteRequest.NewOrder(_apiKey, _apiUrl, json).GetRequest();
-        
-        var response = _client.Send(request);
-
-        json = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-
-        var order = JsonSerializer.Deserialize<DataResponse<PizzaOrder>>(json);
-
-        return order?.Data ?? null;
-    }
-
-    public PizzaOrder? GetCurrentOrder()
-    {
-        var request = PizzaRouteRequest.GetCurrentOrder(_apiKey, _apiUrl).GetRequest();
-
-        var response = _client.Send(request);
-        var json = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-
-        try
+        if (useBlankOrder)
         {
-            var order = JsonSerializer.Deserialize<DataResponse<PizzaOrder>>(json);
-            return order?.Data ?? null;
+            return NewPizzaOrderRequest.NewBlankOrder(orderNumber);
         }
-        catch (Exception)
+        
+        var message = new TextPrompt<string>("Enter message: ").DefaultValue("Order Received").Show(AnsiConsole.Console);
+        var labels = new TextPrompt<string>("Enter labels: ").Show(AnsiConsole.Console);
+        var currentStep = new TextPrompt<int>("Enter current step: ").Show(AnsiConsole.Console);
+        var stepProgress = new TextPrompt<int>("Enter progress: ").DefaultValue(0).Show(AnsiConsole.Console);
+
+        return new NewPizzaOrderRequest()
         {
-            return null;
-        }
+            OrderNumber = orderNumber,
+            Message = message,
+            StepLabels = labels,
+            StepProgress = stepProgress,
+            CurrentStep = currentStep,
+        };
     }
-
-    public bool UpdateOrder(int id, UpdatePizzaOrderRequest orderData)
+    
+    public static UpdatePizzaOrderRequest PromptUpdate(PizzaOrder currentOrder)
     {
-        var json = JsonSerializer.Serialize(orderData);
-        var request = PizzaRouteRequest.UpdateOrder(_apiKey, _apiUrl, id, json).GetRequest();
+        AnsiConsole.MarkupLine($"=== [green] Update order[/] [purple]{currentOrder.OrderNumber}[/] ===");
+        var message = new TextPrompt<string>("Enter message: ").Show(AnsiConsole.Console);
         
-        var response = _client.Send(request);
+        var currentStep = new TextPrompt<PizzaOrderStep>("Enter current step: ").Show(AnsiConsole.Console);
         
-        return response.IsSuccessStatusCode;
-    }
+        
+        var stepProgress = new TextPrompt<int>("Enter progress: ").Show(AnsiConsole.Console);
 
-    public bool CancelOrder(int id)
-    {
-        var request = PizzaRouteRequest.CancelOrder(_apiKey, _apiUrl, id).GetRequest();
-
-        var response = _client.Send(request);
-        
-        return response.IsSuccessStatusCode;
+        return new UpdatePizzaOrderRequest(message, currentStep, stepProgress);
     }
 }

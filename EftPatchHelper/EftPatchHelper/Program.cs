@@ -6,11 +6,13 @@ using EftPatchHelper.EftInfo;
 using EftPatchHelper.Helpers;
 using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
-using EftPatchHelper.Model.PizzaRequests;
 using EftPatchHelper.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PizzaOvenApi;
+using PizzaOvenApi.Model;
+using PizzaOvenApi.Model.PizzaRequests;
 using Spectre.Console;
 
 namespace EftPatchHelper
@@ -43,7 +45,7 @@ namespace EftPatchHelper
         ITaskable _compressPatcherTasks;
         ITaskable _uploadTasks;
         ITaskable _uploadMirrorList;
-        PizzaHelper _pizzaHelper;
+        PizzaApi _pizzaApi;
         FileHelper _fileHelper;
         Settings _settings;
         Options _options;
@@ -105,7 +107,7 @@ namespace EftPatchHelper
             ICompressPatcherTasks compressPatcherTasks,
             IUploadTasks uploadTasks,
             IMirrorUploader uploadMirrorList,
-            PizzaHelper pizzaHelper,
+            PizzaApi pizzaApi,
             FileHelper fileHelper,
             Settings settings,
             Options options
@@ -120,7 +122,7 @@ namespace EftPatchHelper
             _compressPatcherTasks = compressPatcherTasks;
             _uploadMirrorList = uploadMirrorList;
             _uploadTasks = uploadTasks;
-            _pizzaHelper = pizzaHelper;
+            _pizzaApi = pizzaApi;
             _fileHelper = fileHelper;
             _settings = settings;
             _options = options;
@@ -279,7 +281,7 @@ namespace EftPatchHelper
                 switch (answer)
                 {
                     case PizzaApiOption.GetCurrent:
-                        var currentOrder = _pizzaHelper.GetCurrentOrder();
+                        var currentOrder = _pizzaApi.GetCurrentOrder();
 
                         if (currentOrder is null)
                         {
@@ -287,11 +289,11 @@ namespace EftPatchHelper
                             break;
                         }
 
-                        currentOrder.AnsiPrint();
+                        PizzaHelper.AnsiPrint(currentOrder);
                         break;
                     case PizzaApiOption.NewOrder:
-                        var newOrder = NewPizzaOrderRequest.PromptCreate();
-                        if (_pizzaHelper.PostNewOrder(newOrder) == null)
+                        var newOrder = PizzaHelper.PromptCreate();
+                        if (_pizzaApi.PostNewOrder(newOrder) == null)
                         {
                             AnsiConsole.MarkupLine("[red]Failed to create new order[/]");
                             break;
@@ -300,7 +302,7 @@ namespace EftPatchHelper
                         AnsiConsole.MarkupLine("[green]Order create[/]");
                         break;
                     case PizzaApiOption.UpdateCurrent:
-                        currentOrder = _pizzaHelper.GetCurrentOrder();
+                        currentOrder = _pizzaApi.GetCurrentOrder();
 
                         if (currentOrder == null)
                         {
@@ -308,12 +310,12 @@ namespace EftPatchHelper
                             break;
                         }
 
-                        currentOrder.AnsiPrint();
+                        PizzaHelper.AnsiPrint(currentOrder);
                         AnsiConsole.Write(new Rule());
 
-                        var updatedOrder = UpdatePizzaOrderRequest.PromptUpdate(currentOrder);
+                        var updatedOrder = PizzaHelper.PromptUpdate(currentOrder);
 
-                        if (_pizzaHelper.UpdateOrder(currentOrder.Id, updatedOrder))
+                        if (_pizzaApi.UpdateOrder(currentOrder.Id, updatedOrder))
                         {
                             AnsiConsole.MarkupLine("[green]Order updated[/]");
                             break;
@@ -383,11 +385,11 @@ namespace EftPatchHelper
                     
                     if (_settings.UsingPizzaOven() && _options.UpdatePizzaStatus)
                     {
-                        var currentOrder = _pizzaHelper.GetCurrentOrder();
+                        var currentOrder = _pizzaApi.GetCurrentOrder();
 
                         if (currentOrder != null)
                         {
-                            if (_pizzaHelper.CancelOrder(currentOrder.Id))
+                            if (_pizzaApi.CancelOrder(currentOrder.Id))
                             {
                                 AnsiConsole.MarkupLine($"[green]Current Order (#{currentOrder.OrderNumber}) cancelled[/]");
                             }
@@ -412,7 +414,7 @@ namespace EftPatchHelper
 
                         var newOrder = NewPizzaOrderRequest.NewBlankOrder(sourceVersion);
                     
-                        order = _pizzaHelper.PostNewOrder(newOrder);
+                        order = _pizzaApi.PostNewOrder(newOrder);
 
                         AnsiConsole.MarkupLine(order != null
                             ? $"[green]Order #{order.OrderNumber} created[/]"
@@ -463,7 +465,7 @@ namespace EftPatchHelper
                 services.AddSingleton<FileHelper>();
                 services.AddSingleton<ZipHelper>();
                 services.AddSingleton<R2Helper>();
-                services.AddSingleton<PizzaHelper>();
+                services.AddSingleton<PizzaApi>();
 
                 services.AddScoped<EftClientSelector>();
                 

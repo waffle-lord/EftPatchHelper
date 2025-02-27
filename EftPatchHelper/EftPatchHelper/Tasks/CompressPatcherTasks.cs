@@ -2,7 +2,9 @@
 using EftPatchHelper.Helpers;
 using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
-using EftPatchHelper.Model.PizzaRequests;
+using PizzaOvenApi;
+using PizzaOvenApi.Model;
+using PizzaOvenApi.Model.PizzaRequests;
 using Spectre.Console;
 
 namespace EftPatchHelper.Tasks;
@@ -12,14 +14,14 @@ public class CompressPatcherTasks : ICompressPatcherTasks
     private Options _options;
     private FileHelper _fileHelper;
     private ZipHelper _zipHelper;
-    private PizzaHelper _pizzaHelper;
+    private PizzaApi _pizzaApi;
     
-    public CompressPatcherTasks(Options options, FileHelper fileHelper, ZipHelper zipHelper, PizzaHelper pizzaHelper)
+    public CompressPatcherTasks(Options options, FileHelper fileHelper, ZipHelper zipHelper, PizzaApi pizzaApi)
     {
         _options = options;
         _fileHelper = fileHelper;
         _zipHelper = zipHelper;
-        _pizzaHelper = pizzaHelper;
+        _pizzaApi = pizzaApi;
     }
 
     public bool CompressPatcher(IProgress<int>? orderProgress)
@@ -65,9 +67,9 @@ public class CompressPatcherTasks : ICompressPatcherTasks
 
     public void Run()
     {
-        var order = _pizzaHelper.GetCurrentOrder();
+        var order = _pizzaApi.GetCurrentOrder();
         
-        var orderProgressReporter = new PizzaOrderProgressHelper(_pizzaHelper, 1, "Packing up your order");
+        var orderProgressReporter = new PizzaOrderProgressHelper(_pizzaApi, 1, "Packing up your order");
         var orderProgress = order != null ? orderProgressReporter.GetProgressReporter(order, PizzaOrderStep.Pack) : null;
         
         CompressPatcher(orderProgress).ValidateOrExit();

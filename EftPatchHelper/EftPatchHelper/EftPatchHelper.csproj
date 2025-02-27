@@ -40,4 +40,8 @@
     <EmbeddedResource Include="Resources\7z.dll" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PizzaOvenApi\PizzaOvenApi.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -3,7 +3,9 @@ using EftPatchHelper.Extensions;
 using EftPatchHelper.Helpers;
 using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
-using EftPatchHelper.Model.PizzaRequests;
+using PizzaOvenApi;
+using PizzaOvenApi.Model;
+using PizzaOvenApi.Model.PizzaRequests;
 using Spectre.Console;
 
 namespace EftPatchHelper.Tasks
@@ -12,13 +14,13 @@ namespace EftPatchHelper.Tasks
     {
         Settings _settings;
         Options _options;
-        PizzaHelper _pizzaHelper;
+        PizzaApi _pizzaApi;
 
-        public FileProcessingTasks(Settings settings, Options options, PizzaHelper pizzaHelper)
+        public FileProcessingTasks(Settings settings, Options options, PizzaApi pizzaApi)
         {
             _settings = settings;
             _options = options;
-            _pizzaHelper = pizzaHelper;
+            _pizzaApi = pizzaApi;
         }
 
         private bool BackupClients(IProgress<int>? orderProgress)
@@ -47,9 +49,9 @@ namespace EftPatchHelper.Tasks
 
         public void Run()
         {
-            var order = _pizzaHelper.GetCurrentOrder();
+            var order = _pizzaApi.GetCurrentOrder();
             
-            var orderProgressHelper = new PizzaOrderProgressHelper(_pizzaHelper, 3, "Backing up some data");
+            var orderProgressHelper = new PizzaOrderProgressHelper(_pizzaApi, 3, "Backing up some data");
             var orderProgress = order != null ? orderProgressHelper.GetProgressReporter(order, PizzaOrderStep.Setup) : null;
             
             AnsiConsole.Write(new Rule("Starting Tasks, this will take some time :)"));

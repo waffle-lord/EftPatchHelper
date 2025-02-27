@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace EftPatchHelper.Model;
+namespace PizzaOvenApi.Model;
 
 public class DataResponse<T>
 {

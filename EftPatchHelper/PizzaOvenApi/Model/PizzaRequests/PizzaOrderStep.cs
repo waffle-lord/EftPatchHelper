@@ -1,4 +1,4 @@
-﻿namespace EftPatchHelper.Model.PizzaRequests;
+﻿namespace PizzaOvenApi.Model.PizzaRequests;
 
 public enum PizzaOrderStep
 {

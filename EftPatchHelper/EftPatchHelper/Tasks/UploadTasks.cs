@@ -3,7 +3,9 @@ using EftPatchHelper.Interfaces;
 using EftPatchHelper.Model;
 using Spectre.Console;
 using EftPatchHelper.Helpers;
-using EftPatchHelper.Model.PizzaRequests;
+using PizzaOvenApi;
+using PizzaOvenApi.Model;
+using PizzaOvenApi.Model.PizzaRequests;
 
 namespace EftPatchHelper.Tasks
 {
@@ -12,18 +14,18 @@ namespace EftPatchHelper.Tasks
         private readonly Options _options;
         private readonly Settings _settings;
         private readonly FileHelper _fileHelper;
-        private readonly PizzaHelper _pizzaHelper;
+        private readonly PizzaApi _pizzaApi;
         private readonly R2Helper _r2;
         private readonly List<IFileUpload> _fileUploads = new();
         private readonly Dictionary<IFileUpload, ProgressTask> _uploadTasks = new();
 
-        public UploadTasks(Options options, Settings settings, R2Helper r2, FileHelper fileHelper, PizzaHelper pizzaHelper)
+        public UploadTasks(Options options, Settings settings, R2Helper r2, FileHelper fileHelper, PizzaApi pizzaApi)
         {
             _options = options;
             _settings = settings;
             _r2 = r2;
             _fileHelper = fileHelper;
-            _pizzaHelper = pizzaHelper;
+            _pizzaApi = pizzaApi;
         }
 
         private async Task<bool> BuildUploadList()
@@ -136,10 +138,10 @@ namespace EftPatchHelper.Tasks
                 new PercentageColumn(),
                 new RemainingTimeColumn(),
                 new SpinnerColumn(Spinner.Known.Dots2)
-                ).StartAsync<bool>(async context =>
+                ).StartAsync(async context =>
             {
                 
-                    var orderProgressReporter = new PizzaOrderProgressHelper(_pizzaHelper, _fileUploads.Count,
+                    var orderProgressReporter = new PizzaOrderProgressHelper(_pizzaApi, _fileUploads.Count,
                         "We are preparing to upload your order", -1);
 
                     var orderProgress = order != null
@@ -157,7 +159,7 @@ namespace EftPatchHelper.Tasks
                     {
                         orderProgressReporter.IncrementPart($"{pair.Key.ServiceName} - {pair.Key.UploadFileInfo.HumanLength()}");
                         // set the value of the progress task object
-                        var progress = new System.Progress<double>((d) =>
+                        var progress = new Progress<double>((d) =>
                         {
                             pair.Value.Value = d;
                             orderProgress?.Report((int)d);
@@ -192,7 +194,7 @@ namespace EftPatchHelper.Tasks
 
         public void Run()
         {
-            var order = _pizzaHelper.GetCurrentOrder();
+            var order = _pizzaApi.GetCurrentOrder();
             
             if (_options is { UploadToGoFile: false, UploadToMega: false, UploadToSftpSites: false, UplaodToR2: false }) return;
 

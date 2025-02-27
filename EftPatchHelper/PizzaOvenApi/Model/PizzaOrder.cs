@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
-using Spectre.Console;
 
-namespace EftPatchHelper.Model;
+namespace PizzaOvenApi.Model;
 
 public class PizzaOrder
 {
@@ -40,16 +39,5 @@ public class PizzaOrder
         var labels = StepLabels.Split(",");
 
         return currentStep >= labels.Length || currentStep < 0 ? "--ERROR--" : labels[currentStep];
-    }
-
-    public void AnsiPrint()
-    {
-        AnsiConsole.MarkupLine("=== Current Open Order ===");
-        AnsiConsole.MarkupLine($"Order #       : [blue]{OrderNumber}[/]");
-        AnsiConsole.MarkupLine($"Message       : [blue]{Message.EscapeMarkup()}[/]");
-        AnsiConsole.MarkupLine($"Status        : [blue]{Status}[/]");
-        AnsiConsole.MarkupLine($"Labels        : [blue]{StepLabels}[/]");
-        AnsiConsole.MarkupLine($"Current Step  : [blue]{CurrentStep}[/]");
-        AnsiConsole.MarkupLine($"Step Progress : [blue]{StepProgress}[/]");
     }
 }
