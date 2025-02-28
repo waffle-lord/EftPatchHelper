@@ -9,15 +9,13 @@ namespace EftPatchHelper.Tasks
     {
         private Settings _settings;
         private Options _options;
-        private PizzaApi _pizzaApi;
 
         List<FileSystemInfo> _fileToRemove = new List<FileSystemInfo>();
 
-        public CleanupTask(Settings settings, Options options, PizzaApi pizzaApi)
+        public CleanupTask(Settings settings, Options options)
         {
             _settings = settings;
             _options = options;
-            _pizzaApi = pizzaApi;
         }
 
         private void GetPathsToRemove()

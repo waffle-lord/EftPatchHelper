@@ -23,9 +23,9 @@ public class PizzaOrderProgressHelper
             throw new ArgumentException("Part count must be greater than 0", nameof(partCount));
         }
 
-        if (overrideStartingPart < 0)
+        if (overrideStartingPart < -1)
         {
-            throw new ArgumentException("Override part count must be greater than 0", nameof(overrideStartingPart));
+            throw new ArgumentException("Override part count must be greater than or equal to -1", nameof(overrideStartingPart));
         }
         
         _pizzaApi = pizzaApi;

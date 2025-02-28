@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using PizzaOvenApi;
 using PizzaOvenApi.Model;
 using PizzaOvenApi.Model.PizzaRequests;
+using RestSharp.Portable;
 using Spectre.Console;
 
 namespace EftPatchHelper
@@ -449,54 +450,42 @@ namespace EftPatchHelper
         private static IHost ConfigureHost(string[] args)
         {
             return Host.CreateDefaultBuilder(args).ConfigureServices((_, services) =>
-            {
-                var client = new HttpClient() { Timeout = TimeSpan.FromHours(1) };
-                PizzaApi? pizzaApi = null;
-                
-                services.AddSingleton<Options>();
-                services.AddSingleton(client);
-                services.AddSingleton<Settings>(serviceProvider =>
                 {
-                    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+                    var client = new HttpClient() { Timeout = TimeSpan.FromHours(1) };
+                    
+                    var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
                     var settings = configuration.Get<Settings>();
                     if (settings == null) throw new Exception("Failed to retrieve settings");
-
-                    if (settings.UsingPizzaOven())
-                    {
-                        pizzaApi = new PizzaApi(settings.PizzaApiKey, settings.PizzaApiUrl, client);
-                    }
                     
-                    return settings;
-                });
-
-                if (pizzaApi != null)
-                {
+                    var pizzaApi = new PizzaApi(settings.PizzaApiKey, settings.PizzaApiUrl, client);
                     services.AddSingleton(pizzaApi);
-                }
-                
 
-                services.AddSingleton<FileHelper>();
-                services.AddSingleton<ZipHelper>();
-                services.AddSingleton<R2Helper>();
+                    services.AddSingleton<Options>();
+                    services.AddSingleton(client);
+                    services.AddSingleton(settings);
 
-                services.AddScoped<EftClientSelector>();
-                
-                services.AddTransient<ISettingsTask, StartupSettingsTask>();
-                services.AddTransient<ICleanupTask, CleanupTask>();
-                services.AddTransient<IClientSelectionTask, ClientSelectionTask>();
-                services.AddTransient<IFileProcessingTasks, FileProcessingTasks>();
-                services.AddTransient<IPatchGenTasks, PatchGenTasks>();
-                services.AddTransient<IPatchTestingTasks, PatchTestingTasks>();
-                services.AddTransient<ICompressPatcherTasks, CompressPatcherTasks>();
-                services.AddTransient<IUploadTasks, UploadTasks>();
-                services.AddTransient<IMirrorUploader, UploadMirrorListTasks>();
-                services.AddTransient<Program>();
-            })
-            .ConfigureAppConfiguration((_, config) =>
-            {
-                config.AddJsonFile(Settings.settingsFile, optional: true, reloadOnChange: true);
-            })
-            .Build();
+                    services.AddSingleton<FileHelper>();
+                    services.AddSingleton<ZipHelper>();
+                    services.AddSingleton<R2Helper>();
+
+                    services.AddScoped<EftClientSelector>();
+
+                    services.AddTransient<ISettingsTask, StartupSettingsTask>();
+                    services.AddTransient<ICleanupTask, CleanupTask>();
+                    services.AddTransient<IClientSelectionTask, ClientSelectionTask>();
+                    services.AddTransient<IFileProcessingTasks, FileProcessingTasks>();
+                    services.AddTransient<IPatchGenTasks, PatchGenTasks>();
+                    services.AddTransient<IPatchTestingTasks, PatchTestingTasks>();
+                    services.AddTransient<ICompressPatcherTasks, CompressPatcherTasks>();
+                    services.AddTransient<IUploadTasks, UploadTasks>();
+                    services.AddTransient<IMirrorUploader, UploadMirrorListTasks>();
+                    services.AddTransient<Program>();
+                })
+                .ConfigureAppConfiguration((_, config) =>
+                {
+                    config.AddJsonFile(Settings.settingsFile, optional: true, reloadOnChange: true);
+                })
+                .Build();
         }
     }
 }
