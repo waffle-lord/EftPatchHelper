@@ -141,15 +141,32 @@ namespace EftPatchHelper
             return patcher.Directory?.GetFiles("*.7z", SearchOption.TopDirectoryOnly).FirstOrDefault();
         }
 
-        private void CreateExampleMirrorsFile()
+        private void CreateExampleMirrorsFile(FileInfo? existingPatcher = null)
         {
             var mirrorFilePath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                "Downloads\\mirror.json");
+                "Downloads\\mirrors.json");
+
+            var sourceVersion = 445566;
+            var targetVersion = 112233;
+
+            if (existingPatcher != null)
+            {
+                var splitInfo = existingPatcher.Name.Split('_');
+
+                if (splitInfo.Length == 4)
+                {
+                    var sourceString = splitInfo[1];
+                    var targetString = splitInfo[3];
+
+                    int.TryParse(sourceString.Split('.').Last(), out sourceVersion);
+                    int.TryParse(targetString.Split('.').Last(), out targetVersion);
+                }
+            }
                     
             var examplePatchInfo = new PatchInfo()
             {
-                SourceClientVersion = 445566,
-                TargetClientVersion = 112233,
+                SourceClientVersion = sourceVersion,
+                TargetClientVersion = targetVersion,
                 Mirrors = new List<DownloadMirror>()
                 {
                     new DownloadMirror()
@@ -351,7 +368,7 @@ namespace EftPatchHelper
                 {
                     return x switch
                     {
-                        RunOption.MirrorTemplate => "Create mirror.json template",
+                        RunOption.MirrorTemplate => $"Create mirrors.json {(existingPatchFile != null ? $"for {existingPatchFile.Name}" : "template")}",
                         RunOption.PizzaOvenApi => "Pizza Oven API",
                         RunOption.FileHash => $"Get file hash: {fileName}",
                         RunOption.UploadOnly => $"Upload Existing File: {fileName}",
@@ -372,7 +389,7 @@ namespace EftPatchHelper
             switch (answer)
             {
                 case RunOption.MirrorTemplate:
-                    CreateExampleMirrorsFile();
+                    CreateExampleMirrorsFile(existingPatchFile);
                     break;
                 case RunOption.PizzaOvenApi:
                     ProcessPizzaApiDirect();
