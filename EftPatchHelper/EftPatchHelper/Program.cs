@@ -159,7 +159,7 @@ namespace EftPatchHelper
                     var targetString = splitInfo[3];
 
                     int.TryParse(sourceString.Split('.').Last(), out sourceVersion);
-                    int.TryParse(targetString.Split('.').Last(), out targetVersion);
+                    int.TryParse(targetString.Split('.')[..^1].Last(), out targetVersion);
                 }
             }
                     
