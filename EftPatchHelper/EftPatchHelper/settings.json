@@ -1,33 +1,37 @@
+// you will need to remove any comments from this file to use it
+// anything marked (optional) should be left blank if you are not using it
+// R2 is recommended for uploads. Other options are available, but are not well tested anymore
+// pizza api is for the patcher pizza website. You need to be running the site to use these options
 {
-  "targetEftVersion": "",
-  "prepFolderPath": "",
-  "backupFolderPath": "",
-  "liveEftPath": "",
-  "patcherExePath": "",
-  "autoZip": true,
-  "autoClose": false,
-  "latestReleaseUrl": "",
-  "megaEmail": "",
-  "megaPassword": "",
-  "megaUploadFolder": "",
-  "goFileApiKey": "",
-  "goFileFolderId": "",
-  "r2ConnectedDomainUrl": "",
-  "r2ServiceUrl": "",
-  "r2BucketName": "",
-  "r2AccessKeyId": "",
-  "r2SecretKeyId": "",
-  "pizzaApiKey": "",
-  "pizzaApiUrl": "",
+  "targetEftVersion": "", // the target client version, this can be saved during patch generation. Just leave blank
+  "prepFolderPath": "c:\\patchPrep", // a temporary storage area to prep patching data. Keep this path as short as possible. The underlying patching utilites don't like super long paths
+  "backupFolderPath": "c:\\eftClients", // the folder path to backup client files to
+  "liveEftPath": "C:\\Battlestate Games\\Escape from Tarkov", // path to your eft install folder
+  "patcherExePath": "C:\\patcher\\PatchGenerator.exe", // path to your patchgenerator.exe file
+  "autoZip": true, // automatically compress patche
+  "autoClose": true, // automatically close patch generator after generation
+  "latestReleaseUrl": "https://website-name.com/release.json", // the url to the release.json to get release information
+  "megaEmail": "", // (optional) mega upload email
+  "megaPassword": "", // (optional) mega password
+  "megaUploadFolder": "", // (optional) mega folder to upload into
+  "goFileApiKey": "", // (optional) gofile api key
+  "goFileFolderId": "", // (optional) gofile folder ID to upload into
+  "r2ConnectedDomainUrl": "https://slugma.website-name.com", // (optional, but recommended) R2 domain url
+  "r2ServiceUrl": "https://<serviceID>.r2.cloudflarestorage.com", // (optional, but recommended) 
+  "r2BucketName": "slugma", // (optional, but recommended) R2 bucket name
+  "r2AccessKeyId": "123123123", // (optional, but recommended) R2 access key ID
+  "r2SecretKeyId": "123123123", // (optional, but recommended) R2 secret ID
+  "pizzaApiKey": "", // (optional) patcherpizza api key
+  "pizzaApiUrl": "", // (optional) patcherpizza api url
   "sftpUploads": [
     {
       "username": "example-remove-before-using",
       "password": "password123",
       "hostKey": "ssh-ed12345 SLKDJFK3928D2LDKFJ2",
-      "hostname": "sftp.slugma-ligma.com",
+      "hostname": "sftp.website-name.com",
       "port": 12345,
       "uploadPath": "/public/patchers",
-      "httpPath": "https://mirror.slugma-ligma.com/patchers",
+      "httpPath": "https://mirror.website-name.com/patchers",
       "allowHubEntry": true
     }
   ]
