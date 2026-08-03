@@ -8,7 +8,7 @@
   "backupFolderPath": "c:\\eftClients", // the folder path to backup client files to
   "liveEftPath": "C:\\Battlestate Games\\Escape from Tarkov", // path to your eft install folder
   "patcherExePath": "C:\\patcher\\PatchGenerator.exe", // path to your patchgenerator.exe file
-  "autoZip": true, // automatically compress patche
+  "autoZip": true, // automatically compress patches
   "autoClose": true, // automatically close patch generator after generation
   "latestReleaseUrl": "https://website-name.com/release.json", // the url to the release.json to get release information
   "megaEmail": "", // (optional) mega upload email
@@ -17,7 +17,7 @@
   "goFileApiKey": "", // (optional) gofile api key
   "goFileFolderId": "", // (optional) gofile folder ID to upload into
   "r2ConnectedDomainUrl": "https://slugma.website-name.com", // (optional, but recommended) R2 domain url
-  "r2ServiceUrl": "https://<serviceID>.r2.cloudflarestorage.com", // (optional, but recommended) 
+  "r2ServiceUrl": "https://<serviceID>.r2.cloudflarestorage.com", // (optional, but recommended) service url for R2
   "r2BucketName": "slugma", // (optional, but recommended) R2 bucket name
   "r2AccessKeyId": "123123123", // (optional, but recommended) R2 access key ID
   "r2SecretKeyId": "123123123", // (optional, but recommended) R2 secret ID
