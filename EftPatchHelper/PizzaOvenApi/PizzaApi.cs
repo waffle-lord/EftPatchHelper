@@ -62,13 +62,11 @@ public class PizzaApi
     /// <returns>The current order, or null if one doesn't exist</returns>
     public async Task<PizzaOrder?> GetCurrentOrderAsync()
     {
-        var request = PizzaRouteRequest.GetCurrentOrder(_apiKey, _apiUrl).GetRequest();
-
-        var response = await _client.SendAsync(request);
-        var json = await response.Content.ReadAsStringAsync();
-
         try
         {
+            var request = PizzaRouteRequest.GetCurrentOrder(_apiKey, _apiUrl).GetRequest();
+            var response = await _client.SendAsync(request);
+            var json = await response.Content.ReadAsStringAsync();
             var order = JsonSerializer.Deserialize<DataResponse<PizzaOrder>>(json);
             return order?.Data ?? null;
         }
